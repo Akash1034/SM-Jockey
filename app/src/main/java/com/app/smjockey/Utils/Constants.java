@@ -11,7 +11,7 @@ public class Constants {
     public static String user_details_url="https://smjockey.co/api/v1/me";
     public static String GET_REQUEST_TAG="User Details Request";
     public static String TOKEN_FILE="UserToken";
-    public static String streams_url="https://smjockey.co/api/v1/streams";
+    public static String streams_url="https://smjockey.co/api/v1/streams/?page=";
     public static String posts_url="https://smjockey.co/api/v1/streams/post";
     public static String livewall_url="https://brands.eventifier.com/api/v1/streams/1429/posts/";
 }
