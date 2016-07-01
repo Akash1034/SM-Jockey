@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
 import com.android.volley.VolleyError;
@@ -35,7 +36,6 @@ public class StreamActivity extends AppCompatActivity implements SwipeRefreshLay
     private List<Streams> streamsList;
 
     private SwipeRefreshLayout swipeRefreshLayout;
-    private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private LinearLayoutManager layoutManager;
 
@@ -58,12 +58,14 @@ public class StreamActivity extends AppCompatActivity implements SwipeRefreshLay
         Log.d(TAG,"My token:"+user_token);
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         if (recyclerView != null) {
             recyclerView.setHasFixedSize(true);
         }
         layoutManager = new LinearLayoutManager(StreamActivity.this);
-        recyclerView.setLayoutManager(layoutManager);
+        if (recyclerView != null) {
+            recyclerView.setLayoutManager(layoutManager);
+        }
 
         streamsList=new ArrayList<>();
 
@@ -84,6 +86,7 @@ public class StreamActivity extends AppCompatActivity implements SwipeRefreshLay
             int pastVisiblesItems;
             int visibleItemCount;
             int totalItemCount;
+            boolean isEndOfList;
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
@@ -96,16 +99,23 @@ public class StreamActivity extends AppCompatActivity implements SwipeRefreshLay
                     visibleItemCount = layoutManager.getChildCount();
                     totalItemCount = layoutManager.getItemCount();
                     pastVisiblesItems = layoutManager.findFirstCompletelyVisibleItemPosition();
-                    if (loading)
-                    {
-                        if ( (visibleItemCount + pastVisiblesItems) >= totalItemCount)
-                        {
-                            loading = false;
-                            page++;
-                            getStreams();
-                        }
-                    }
+                    Log.d(TAG,visibleItemCount+"-"+pastVisiblesItems+"-"+totalItemCount);
 
+                if (totalItemCount > visibleItemCount)
+                    checkEndOfList();
+
+            }
+            private synchronized void checkEndOfList() {
+                if (pastVisiblesItems >= (totalItemCount - 3)) {
+                    if (!isEndOfList) {
+                        page++;
+                        getStreams();
+                        Log.d(TAG,"Getting data");
+                    }
+                    isEndOfList = true;
+                } else {
+                    isEndOfList = false;
+                }
             }
         });
 
@@ -175,6 +185,8 @@ public class StreamActivity extends AppCompatActivity implements SwipeRefreshLay
 
     @Override
     public void onRefresh() {
+        page=1;
+        Log.d(TAG,"page:"+page);
         if(tags!=null && !tags.isEmpty())
             tags.clear();
         if(!streamsList.isEmpty())
