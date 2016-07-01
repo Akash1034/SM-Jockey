@@ -22,11 +22,10 @@ public class SplashScreen extends AppCompatActivity {
 
     private static final String TAG = SplashScreen.class.getSimpleName();
 
-    SharedPreferences.Editor editor;
-    SharedPreferences settings;
+
     boolean loggedIn;
 
-    private String user_token=null;
+    String user_token=null;
     String username;
 
 
@@ -39,35 +38,30 @@ public class SplashScreen extends AppCompatActivity {
         networkIntent.setAction("NetworkChangeReceiver");
         sendBroadcast(networkIntent);
 
-        SharedPreferences pref = getApplicationContext().getSharedPreferences(Constants.TOKEN_FILE, 0);
-        editor = pref.edit();
-        settings = getSharedPreferences(Constants.TOKEN_FILE, 0);
-        loggedIn=settings.getBoolean("loggedIn",false);
-        user_token=settings.getString("user_token",null);
 
+        SharedPreferences pref = getApplicationContext().getSharedPreferences(Constants.TOKEN_FILE, 0);
+        loggedIn=pref.getBoolean("loggedIn",false);
+        user_token=pref.getString("user_token",null);
 
 
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
 
-                if (NetworkChangeReceiver.getConnectivityStatus(getApplicationContext()))
+                if (NetworkChangeReceiver.getConnectivityStatus(getApplicationContext())&&loggedIn)
                 {
-                    if (loggedIn) {
-                        getUserDetails();
-                        Intent streamIntent = new Intent(SplashScreen.this, StreamActivity.class);
-                        streamIntent.putExtra("username",username);
-                        startActivity(streamIntent);
-                        finish();
-
-                    } else {
-                        Intent loginIntent = new Intent(SplashScreen.this, LoginActivity.class);
-                        startActivity(loginIntent);
-                        finish();
-                    }
+                    Log.d(TAG,"Net and logged in");
+                    Intent streamIntent = new Intent(SplashScreen.this, StreamActivity.class);
+                    streamIntent.putExtra("username",username);
+                    startActivity(streamIntent);
+                    finish();
                 }
-                else
-                    Toast.makeText(getApplicationContext(),"Not Connected To Internet",Toast.LENGTH_SHORT).show();
+                else if(NetworkChangeReceiver.getConnectivityStatus(getApplicationContext())&&!loggedIn){
+                    Log.d(TAG,"Net and logged out");
+                    Intent loginIntent = new Intent(SplashScreen.this, LoginActivity.class);
+                    startActivity(loginIntent);
+                    finish();
+                }
             }
         }, Constants.SPLASH_TIME_OUT);
 
@@ -78,31 +72,5 @@ public class SplashScreen extends AppCompatActivity {
         super.onPause();
     }
 
-    private void getUserDetails() {
 
-        NetworkCalls.fetchData(new Responses() {
-            @Override
-            public void onSuccessResponse(JSONObject response) {
-
-                if(response!=null)
-                {
-                    username=response.optString("first_name");
-                }
-                else
-                    username=null;
-            }
-
-            @Override
-            public void onSuccessResponse(String response) {
-
-            }
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                Log.d(TAG,"User Details Request Error:"+error.toString());
-            }
-        },Constants.user_details_url,user_token);
-
-    }
 }
