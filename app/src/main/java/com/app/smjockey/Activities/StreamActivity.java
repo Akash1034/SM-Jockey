@@ -34,6 +34,7 @@ public class StreamActivity extends AppCompatActivity implements SwipeRefreshLay
 
 
     private List<Streams> streamsList;
+    private List<Streams> tempList;
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView.Adapter adapter;
@@ -99,7 +100,7 @@ public class StreamActivity extends AppCompatActivity implements SwipeRefreshLay
                     visibleItemCount = layoutManager.getChildCount();
                     totalItemCount = layoutManager.getItemCount();
                     pastVisiblesItems = layoutManager.findFirstCompletelyVisibleItemPosition();
-                    Log.d(TAG,visibleItemCount+"-"+pastVisiblesItems+"-"+totalItemCount);
+                  //  Log.d(TAG,visibleItemCount+"-"+pastVisiblesItems+"-"+totalItemCount);
 
                 if (totalItemCount > visibleItemCount)
                     checkEndOfList();
@@ -177,6 +178,7 @@ public class StreamActivity extends AppCompatActivity implements SwipeRefreshLay
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.d(TAG, "Volley Error: " + error.toString());
+                page--;
                 swipeRefreshLayout.setRefreshing(false);
             }
         },Constants.streams_url+page,user_token);
@@ -191,6 +193,7 @@ public class StreamActivity extends AppCompatActivity implements SwipeRefreshLay
             tags.clear();
         if(!streamsList.isEmpty())
             streamsList.clear();
+        adapter.notifyDataSetChanged();
         getStreams();
     }
 }
