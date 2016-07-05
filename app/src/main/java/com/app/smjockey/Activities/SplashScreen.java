@@ -62,6 +62,8 @@ public class SplashScreen extends AppCompatActivity {
                     startActivity(loginIntent);
                     finish();
                 }
+                else if(!NetworkChangeReceiver.getConnectivityStatus(getApplicationContext()))
+                    Toast.makeText(getApplicationContext(),"No Internet Connection",Toast.LENGTH_SHORT).show();
             }
         }, Constants.SPLASH_TIME_OUT);
 

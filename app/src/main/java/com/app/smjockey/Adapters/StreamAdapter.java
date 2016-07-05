@@ -2,6 +2,7 @@ package com.app.smjockey.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -12,6 +13,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.app.smjockey.Activities.PostActivity;
+import com.app.smjockey.Fragments.PostFragment;
 import com.app.smjockey.Models.Streams;
 import com.app.smjockey.R;
 
@@ -74,11 +77,11 @@ public class StreamAdapter extends RecyclerView.Adapter<StreamAdapter.ViewHolder
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    /*Log.d(TAG, "Stream id and name:" + streamItem.getId() + " " + streamItem.getName());
+                    Log.d(TAG, "Stream id and name:" + streamItem.getId() + " " + streamItem.getName());
                     Intent intent=new Intent(mContext,PostActivity.class);
                     intent.putExtra("Stream ID",streamItem.getId());
                     intent.putExtra("Stream Name",streamItem.getName());
-                    mContext.startActivity(intent);*/
+                    mContext.startActivity(intent);
                     Toast.makeText(mContext,"Card Clicked",Toast.LENGTH_SHORT).show();
                 }
             });
