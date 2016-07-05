@@ -71,7 +71,9 @@ public class StreamActivity extends AppCompatActivity implements SwipeRefreshLay
         streamsList=new ArrayList<>();
 
         adapter=new StreamAdapter(StreamActivity.this,streamsList);
-        recyclerView.setAdapter(adapter);
+        if (recyclerView != null) {
+            recyclerView.setAdapter(adapter);
+        }
 
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.post(new Runnable() {
@@ -82,43 +84,44 @@ public class StreamActivity extends AppCompatActivity implements SwipeRefreshLay
             }
         });
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            private boolean loading = true;
-            int pastVisiblesItems;
-            int visibleItemCount;
-            int totalItemCount;
-            boolean isEndOfList;
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-            }
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
-                    visibleItemCount = layoutManager.getChildCount();
-                    totalItemCount = layoutManager.getItemCount();
-                    pastVisiblesItems = layoutManager.findFirstCompletelyVisibleItemPosition();
-                  //  Log.d(TAG,visibleItemCount+"-"+pastVisiblesItems+"-"+totalItemCount);
-
-                if (totalItemCount > visibleItemCount)
-                    checkEndOfList();
-
-            }
-            private synchronized void checkEndOfList() {
-                if (pastVisiblesItems >= (totalItemCount - 3)) {
-                    if (!isEndOfList) {
-                        page++;
-                        getStreams();
-                        Log.d(TAG,"Getting data");
-                    }
-                    isEndOfList = true;
-                } else {
-                    isEndOfList = false;
+        if (recyclerView != null) {
+            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                int pastVisiblesItems;
+                int visibleItemCount;
+                int totalItemCount;
+                boolean isEndOfList;
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
                 }
-            }
-        });
+
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+
+                        visibleItemCount = layoutManager.getChildCount();
+                        totalItemCount = layoutManager.getItemCount();
+                        pastVisiblesItems = layoutManager.findFirstCompletelyVisibleItemPosition();
+                      //  Log.d(TAG,visibleItemCount+"-"+pastVisiblesItems+"-"+totalItemCount);
+
+                    if (totalItemCount > visibleItemCount)
+                        checkEndOfList();
+
+                }
+                private synchronized void checkEndOfList() {
+                    if (pastVisiblesItems >= (totalItemCount - 3)) {
+                        if (!isEndOfList) {
+                            page++;
+                            getStreams();
+                            Log.d(TAG,"Getting data");
+                        }
+                        isEndOfList = true;
+                    } else {
+                        isEndOfList = false;
+                    }
+                }
+            });
+        }
 
     }
 

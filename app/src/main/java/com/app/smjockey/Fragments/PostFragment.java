@@ -2,10 +2,12 @@ package com.app.smjockey.Fragments;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ListView;
 
 import com.android.volley.VolleyError;
@@ -26,7 +28,7 @@ import java.util.List;
 /**
  * Created by Akash Srivastava on 04-07-2016.
  */
-public class PostFragment extends android.support.v4.app.Fragment{
+public class PostFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener{
 
     String user_token=null;
     String streamID;
@@ -53,7 +55,9 @@ public class PostFragment extends android.support.v4.app.Fragment{
     String text;
 
     private ListView listView;
-
+    int offset=1;
+    PostAdapter adapter;
+    SwipeRefreshLayout swipeRefreshLayout;
 
     static Bundle bundles;
 
@@ -72,6 +76,8 @@ public class PostFragment extends android.support.v4.app.Fragment{
 
         View rootView = inflater.inflate(R.layout.post_fragment, container, false);
 
+        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout);
+
         listView = (ListView) rootView.findViewById(R.id.list);
 
         settings = getActivity().getSharedPreferences(Constants.TOKEN_FILE, 0);
@@ -82,6 +88,58 @@ public class PostFragment extends android.support.v4.app.Fragment{
 
         postsList=new ArrayList<>();
 
+         adapter= new PostAdapter(getActivity(), postsList);
+        listView.setAdapter(adapter);
+        swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG,"Inside Run");
+                getPosts();
+            }
+        });
+
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+
+            int lastVisibleItem;
+            int totalItemCount;
+            boolean isEndOfList;
+
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) { }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem,
+                                 int visibleItemCount, int totalItemCount) {
+                this.totalItemCount = totalItemCount;
+                this.lastVisibleItem = firstVisibleItem + visibleItemCount - 1;
+                // prevent checking on short lists
+                if (totalItemCount > visibleItemCount)
+                    checkEndOfList();
+                }
+
+            private synchronized void checkEndOfList() {
+                // trigger after 2nd to last item
+                if (lastVisibleItem >= (totalItemCount - 2)) {
+                    if (!isEndOfList) {
+                        // LOAD MORE ITEMS HERE!
+                        offset++;
+                        getPosts();
+                        Log.d(TAG,"Getting data");
+                    }
+                    isEndOfList = true;
+                } else {
+                    isEndOfList = false;
+                }
+            }
+        });
+
+
+        return rootView;
+    }
+
+    public void getPosts()
+    {
         NetworkCalls.fetchData(new Responses() {
             @Override
             public void onSuccessResponse(JSONObject response) {
@@ -97,11 +155,12 @@ public class PostFragment extends android.support.v4.app.Fragment{
 
             @Override
             public void onErrorResponse(VolleyError error) {
+                swipeRefreshLayout.setRefreshing(false);
+                offset--;
 
             }
-        },Constants.posts_url+"/"+streamID+"/posts/?original=true",user_token);
+        },Constants.posts_url+"/"+streamID+"/posts/?original=true&page="+offset,user_token);
 
-        return rootView;
     }
     
     private void parseJsonFeed(JSONObject response)
@@ -146,13 +205,16 @@ public class PostFragment extends android.support.v4.app.Fragment{
                 postItem.setContent_image(image_url);
                 postItem.setProfile_image(profile_image);
                 postItem.setText(text);
+                postItem.setActive(false);
                 postsList.add(postItem);
+                swipeRefreshLayout.setRefreshing(false);
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        PostAdapter adapter = new PostAdapter(getActivity(), postsList);
-        listView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+
+
     }
 
     @Override
@@ -174,5 +236,15 @@ public class PostFragment extends android.support.v4.app.Fragment{
     public static void setArgument(Bundle bundle)
     {
         bundles=bundle;
+    }
+
+    @Override
+    public void onRefresh() {
+
+        offset=1;
+        if(!postsList.isEmpty())
+            postsList.clear();
+        adapter.notifyDataSetChanged();
+        getPosts();
     }
 }

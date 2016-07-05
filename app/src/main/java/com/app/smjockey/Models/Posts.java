@@ -12,14 +12,14 @@ public class Posts {
     String text;
     String content_image;
     String type;
-    String active;
+    boolean active;
 
     public Posts()
     {
 
     }
 
-    public Posts(String id, String profile_image, String name, String username, String text, String content_image, String type, String active) {
+    public Posts(String id, String profile_image, String name, String username, String text, String content_image, String type, Boolean active) {
         this.id = id;
         this.profile_image = profile_image;
         this.name = name;
@@ -86,11 +86,11 @@ public class Posts {
         this.type = type;
     }
 
-    public String getActive() {
+    public Boolean getActive() {
         return active;
     }
 
-    public void setActive(String active) {
+    public void setActive(Boolean active) {
         this.active = active;
     }
 }
