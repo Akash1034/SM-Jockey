@@ -1,4 +1,4 @@
-package com.app.smjockey;
+package com.app.smjockey.Utils;
 
 /**
  * Created by Akash Srivastava on 05-07-2016.
