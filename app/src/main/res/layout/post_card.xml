@@ -63,7 +63,7 @@
             android:paddingTop="@dimen/post_item_status_pad_top" />
 
 
-        <com.app.smjockey.PostImageView
+        <com.app.smjockey.Utils.PostImageView
             android:id="@+id/postImage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
