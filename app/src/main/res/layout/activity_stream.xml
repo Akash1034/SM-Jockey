@@ -1,14 +1,23 @@
-<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/swipe_refresh_layout"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
 
-
-    <view
-        android:id="@+id/recycler_view"
-        class="android.support.v7.widget.RecyclerView"
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar"
+        />
+    <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerInParent="true" />
+        android:layout_height="match_parent">
 
-</android.support.v4.widget.SwipeRefreshLayout>
+        <view
+            android:id="@+id/recycler_view"
+            class="android.support.v7.widget.RecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true" />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+</LinearLayout>
