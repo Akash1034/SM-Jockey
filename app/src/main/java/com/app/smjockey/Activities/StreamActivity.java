@@ -8,6 +8,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
@@ -17,6 +19,7 @@ import com.app.smjockey.R;
 import com.app.smjockey.Utils.Constants;
 import com.app.smjockey.Volley.NetworkCalls;
 import com.app.smjockey.Volley.Responses;
+import com.firebase.client.Firebase;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +34,7 @@ public class StreamActivity extends AppCompatActivity implements SwipeRefreshLay
     String user_token=null;
 
     SharedPreferences pref;
+    SharedPreferences.Editor editor;
 
 
     private List<Streams> streamsList;
@@ -48,12 +52,20 @@ public class StreamActivity extends AppCompatActivity implements SwipeRefreshLay
     ArrayList<String> tags;
     int page=1;
 
+    private Toolbar mToolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stream);
 
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
         pref = getApplicationContext().getSharedPreferences(Constants.TOKEN_FILE,0);
+        editor=pref.edit();
         user_token=pref.getString("user_token",null);
 
         Log.d(TAG,"My token:"+user_token);
@@ -71,7 +83,9 @@ public class StreamActivity extends AppCompatActivity implements SwipeRefreshLay
         streamsList=new ArrayList<>();
 
         adapter=new StreamAdapter(StreamActivity.this,streamsList);
-        recyclerView.setAdapter(adapter);
+        if (recyclerView != null) {
+            recyclerView.setAdapter(adapter);
+        }
 
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.post(new Runnable() {
@@ -82,43 +96,44 @@ public class StreamActivity extends AppCompatActivity implements SwipeRefreshLay
             }
         });
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            private boolean loading = true;
-            int pastVisiblesItems;
-            int visibleItemCount;
-            int totalItemCount;
-            boolean isEndOfList;
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-            }
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
-                    visibleItemCount = layoutManager.getChildCount();
-                    totalItemCount = layoutManager.getItemCount();
-                    pastVisiblesItems = layoutManager.findFirstCompletelyVisibleItemPosition();
-                  //  Log.d(TAG,visibleItemCount+"-"+pastVisiblesItems+"-"+totalItemCount);
-
-                if (totalItemCount > visibleItemCount)
-                    checkEndOfList();
-
-            }
-            private synchronized void checkEndOfList() {
-                if (pastVisiblesItems >= (totalItemCount - 3)) {
-                    if (!isEndOfList) {
-                        page++;
-                        getStreams();
-                        Log.d(TAG,"Getting data");
-                    }
-                    isEndOfList = true;
-                } else {
-                    isEndOfList = false;
+        if (recyclerView != null) {
+            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                int pastVisiblesItems;
+                int visibleItemCount;
+                int totalItemCount;
+                boolean isEndOfList;
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
                 }
-            }
-        });
+
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+
+                        visibleItemCount = layoutManager.getChildCount();
+                        totalItemCount = layoutManager.getItemCount();
+                        pastVisiblesItems = layoutManager.findFirstCompletelyVisibleItemPosition();
+                      //  Log.d(TAG,visibleItemCount+"-"+pastVisiblesItems+"-"+totalItemCount);
+
+                    if (totalItemCount > visibleItemCount)
+                        checkEndOfList();
+
+                }
+                private synchronized void checkEndOfList() {
+                    if (pastVisiblesItems >= (totalItemCount - 3)) {
+                        if (!isEndOfList) {
+                            page++;
+                            getStreams();
+                            Log.d(TAG,"Getting data");
+                        }
+                        isEndOfList = true;
+                    } else {
+                        isEndOfList = false;
+                    }
+                }
+            });
+        }
 
     }
 
@@ -195,5 +210,30 @@ public class StreamActivity extends AppCompatActivity implements SwipeRefreshLay
             streamsList.clear();
         adapter.notifyDataSetChanged();
         getStreams();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_logout) {
+            editor.clear();
+            editor.commit();
+            finish();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
