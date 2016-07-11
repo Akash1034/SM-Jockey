@@ -39,6 +39,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>
     private LayoutInflater inflater;
     private List<Posts> postsList;
     String id;
+    int x;
 
     ImageLoader imageLoader= AppController.getInstance().getImageLoader();
 
