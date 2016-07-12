@@ -3,11 +3,39 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/coordinatorLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    </android.support.v7.widget.RecyclerView>
+        android:layout_height="match_parent"
+        tools:context=".MainActivity">
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        </android.support.v7.widget.RecyclerView>
+
+        <!-- <Button
+
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:gravity="bottom"
+             android:text="Send"
+             android:visibility="invisible"
+             android:layout_centerHorizontal="true" />-->
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:visibility="invisible"
+            android:layout_margin="16dp"
+            android:src="@android:drawable/ic_menu_send" />
+
+    </android.support.design.widget.CoordinatorLayout>
 
 </android.support.v4.widget.SwipeRefreshLayout>

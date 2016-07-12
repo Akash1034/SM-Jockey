@@ -2,6 +2,7 @@ package com.app.smjockey.Fragments;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +18,7 @@ import android.widget.AbsListView;
 import android.widget.ListView;
 
 import com.android.volley.VolleyError;
+import com.app.smjockey.Adapters.ClickListener;
 import com.app.smjockey.Adapters.PostAdapter;
 import com.app.smjockey.Models.Posts;
 import com.app.smjockey.R;
@@ -37,7 +39,7 @@ import java.util.List;
 /**
  * Created by Akash Srivastava on 04-07-2016.
  */
-public class PostFragment extends android.support.v4.app.Fragment implements OnStartDragListener, SwipeRefreshLayout.OnRefreshListener{
+public class PostFragment extends android.support.v4.app.Fragment implements OnStartDragListener, SwipeRefreshLayout.OnRefreshListener ,ClickListener {
 
     static String user_token=null;
     static String streamID;
@@ -61,15 +63,17 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
     String image_url;
     String text;
 
+    FloatingActionButton button;
+    ClickListener clickListener=PostFragment.this;
 
     int offset=1;
 
     SwipeRefreshLayout swipeRefreshLayout;
 
-    private RecyclerView.Adapter adapter;
+    private PostAdapter adapter;
     private LinearLayoutManager layoutManager;
 
-    private List<Posts> postsList;
+    public List<Posts> postsList;
 
     private ItemTouchHelper mItemTouchHelper;
 
@@ -89,6 +93,9 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.post_fragment, container, false);
+
+        button=(FloatingActionButton)rootView.findViewById(R.id.send);
+
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout);
 
@@ -110,7 +117,7 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
 
         postsList = new ArrayList<>();
 
-        adapter = new PostAdapter(getActivity(), postsList);
+        adapter=new PostAdapter(getActivity(),postsList,clickListener,button);
         if (recyclerView != null) {
             recyclerView.setAdapter(adapter);
         }
@@ -165,6 +172,44 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
                     } else {
                         isEndOfList = false;
                     }
+                }
+            });
+
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d(TAG,String.valueOf(adapter.getSelectedItemCount()));
+
+                /*List<Posts> postses=adapter.getSelectedItems();
+                for(int i=0;i<postses.size();i++) {
+                    Log.d(TAG, postses.get(i).getName());
+                    PostAdapter.sendPost(postses.get(i).getId());
+
+                    for(int j=0;j<postsList.size();j++) {
+                        if (postses.get(i).getId() == postsList.get(j).getId()) {
+                            postsList.remove(j);
+                            adapter.notifyItemRemoved(i);
+                            Log.d(TAG, "item removed");
+                        }
+                    }
+                }*/
+                    for(Posts post : postsList)
+                    {
+                        Log.d(TAG,post.getName());
+                        if(post.isSelected())
+                        {
+                            Log.d(TAG,post.getName()+"-"+post.isSelected());
+                            sendPost(post.getId());
+                        }
+                    }
+
+
+
+                    adapter.notifyDataSetChanged();
+                    button.setVisibility(View.INVISIBLE);
+
+
+
                 }
             });
 
@@ -239,7 +284,7 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
                 postItem.setContent_image(image_url);
                 postItem.setProfile_image(profile_image);
                 postItem.setText(text);
-                postItem.setActive(false);
+                postItem.setSelected(false);
                 postsList.add(postItem);
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -250,9 +295,9 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
 
     }
 
-    public static void sendPost(String id)
+    public  void sendPost(String id)
     {
-        NetworkCalls.postData(new Responses() {
+        /*new NetworkCalls.postData(new Responses() {
             @Override
             public void onSuccessResponse(JSONObject response) {
 
@@ -267,6 +312,46 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d(TAG,error.getLocalizedMessage());
+
+            }
+        },"https://brands.eventifier.com/api/v1/streams/"+streamID+"/posts/"+id+"/livewall/",user_token);*/
+        NetworkCalls networkCalls=new NetworkCalls();
+        networkCalls.postData(new Responses() {
+            @Override
+            public void onSuccessResponse(JSONObject response) {
+
+
+            }
+
+            @Override
+            public void onSuccessResponse(String response) {
+                /*for(Posts post : postsList)
+                {
+                    Log.d(TAG,post.getName()+"a");
+                    if(post.isSelected())
+                    {
+                        Log.d(TAG,post.getName()+"-"+post.isSelected());
+                        postsList.remove(post);
+                        adapter.notifyDataSetChanged();
+                    }
+                }
+*/
+                for(int i=0;i<postsList.size();i++)
+                {
+                    Log.d(TAG,postsList.get(i).getName()+"a");
+                    if(postsList.get(i).isSelected())
+                    {
+                        Log.d(TAG,postsList.get(i).getName()+"-"+postsList.get(i).isSelected());
+                        postsList.remove(postsList.get(i));
+                        adapter.notifyItemRemoved(i);
+                    }
+                }
+
+
+            }
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
 
             }
         },"https://brands.eventifier.com/api/v1/streams/"+streamID+"/posts/"+id+"/livewall/",user_token);
@@ -307,4 +392,26 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         mItemTouchHelper.startDrag(viewHolder);
     }
+
+    @Override
+    public void onItemClicked(int position) {
+
+        toggleSelection(position);
+
+    }
+
+    @Override
+    public boolean onItemLongClicked(int position) {
+        // Log.d("Toggle Long Click",postsList.get(position).getName());
+        toggleSelection(position);
+        return true;
+    }
+
+    private void toggleSelection(int position) {
+        //Log.d("Toggle Click",postsList.get(position).getName());
+
+        adapter.toggleSelection (position);
+    }
+
+
 }

@@ -1,13 +1,17 @@
 package com.app.smjockey.Adapters;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.volley.VolleyError;
@@ -28,9 +32,10 @@ import org.json.JSONObject;
 import java.util.List;
 
 /**
+
  * Created by Akash Srivastava on 05-07-2016.
  */
-public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>
+public class PostAdapter extends SelectableAdapter<PostAdapter.ViewHolder>
         implements ItemTouchHelperAdapter {
 
 
@@ -41,19 +46,26 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>
     String id;
     int x;
 
+    ClickListener clickListener;
+    FloatingActionButton button;
+
     ImageLoader imageLoader= AppController.getInstance().getImageLoader();
 
-    public PostAdapter(Context context, List<Posts> postsList) {
+    public PostAdapter(Context context, List<Posts> postsList, ClickListener clickListener,FloatingActionButton button) {
+        super(postsList);
         this.context = context;
         this.postsList = postsList;
+        this.clickListener=clickListener;
+        this.button=button;
     }
 
        @Override
     public PostAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.post_card, null);
-           return new ViewHolder(view);
+           return new ViewHolder(view,clickListener);
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onBindViewHolder(PostAdapter.ViewHolder holder, int position) {
 
@@ -101,6 +113,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>
         } else {
             holder.postImageView.setVisibility(View.GONE);
         }
+        if(isSelected(position)) {
+            holder.selectedOverlay.setBackgroundColor(context.getResources().getColor(R.color.colorPrimaryDark));
+        }
+        else
+            holder.selectedOverlay.setBackground(context.getDrawable(R.drawable.round_background));
     }
 
     @Override
@@ -124,21 +141,27 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>
     public void onItemDismiss(int position) {
         id=postsList.get(position).getId();
         postsList.remove(position);
-        PostFragment.sendPost(id);
+        new PostFragment().sendPost(postsList.get(position).getId());
         notifyItemRemoved(position);
     }
 
 
     class ViewHolder extends RecyclerView.ViewHolder implements
-            ItemTouchHelperViewHolder {
+            ItemTouchHelperViewHolder,View.OnClickListener, View.OnLongClickListener{
         TextView name;
         TextView username;
         TextView post_text;
         NetworkImageView profilePic;
         PostImageView postImageView;
+        Posts postItem;
 
-        public ViewHolder(View itemView) {
+        private ClickListener listener;
+        private final LinearLayout selectedOverlay;
+
+        public ViewHolder(final View itemView, ClickListener listener) {
             super(itemView);
+
+            this.listener = listener;
             name = (TextView) itemView.findViewById(R.id.name);
             username = (TextView) itemView
                     .findViewById(R.id.username);
@@ -148,7 +171,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>
                     .findViewById(R.id.profilePic);
             postImageView = (PostImageView) itemView
                     .findViewById(R.id.postImage);
+            selectedOverlay = (LinearLayout) itemView.findViewById(R.id.selected_overlay);
+
+            itemView.setOnClickListener(this);
+
+            itemView.setOnLongClickListener(this);
         }
+
+
 
         @Override
         public void onItemSelected() {
@@ -159,5 +189,27 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>
         public void onItemClear() {
             itemView.setBackgroundColor(0);
         }
+
+
+        @Override
+        public void onClick(View v) {
+            if (listener != null) {
+                listener.onItemClicked(getAdapterPosition());
+//                Log.d("After click",postItem.getName());
+            }
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            if (listener != null) {
+                button.setVisibility(View.VISIBLE);
+                //     Log.d("After Long Click",postItem.getName());
+                return listener.onItemLongClicked(getAdapterPosition());
+            }
+            return false;
+        }
+
+
+
     }
 }

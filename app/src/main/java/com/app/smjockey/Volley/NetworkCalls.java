@@ -86,7 +86,7 @@ public class NetworkCalls {
 
     }
 
-    public static void postData(final Responses responses, String url, final String user_token) {
+    public  void postData(final Responses responses, String url, final String user_token) {
         StringRequest putRequest = new StringRequest(Request.Method.PUT, url,
                 new Response.Listener<String>()
                 {

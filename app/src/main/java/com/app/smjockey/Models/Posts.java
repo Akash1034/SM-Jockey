@@ -12,14 +12,14 @@ public class Posts {
     String text;
     String content_image;
     String type;
-    boolean active;
+    boolean selected;
 
     public Posts()
     {
 
     }
 
-    public Posts(String id, String profile_image, String name, String username, String text, String content_image, String type, Boolean active) {
+    public Posts(String id, String profile_image, String name, String username, String text, String content_image, String type, Boolean selected) {
         this.id = id;
         this.profile_image = profile_image;
         this.name = name;
@@ -27,7 +27,7 @@ public class Posts {
         this.text = text;
         this.content_image = content_image;
         this.type = type;
-        this.active = active;
+        this.selected = selected;
     }
 
     public String getId() {
@@ -86,11 +86,11 @@ public class Posts {
         this.type = type;
     }
 
-    public Boolean getActive() {
-        return active;
+    public boolean isSelected() {
+        return selected;
     }
 
-    public void setActive(Boolean active) {
-        this.active = active;
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }
