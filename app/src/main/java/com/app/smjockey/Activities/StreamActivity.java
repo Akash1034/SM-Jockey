@@ -69,6 +69,7 @@ public class StreamActivity extends AppCompatActivity implements SwipeRefreshLay
         user_token=pref.getString("user_token",null);
 
         Log.d(TAG,"My token:"+user_token);
+        int x;
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
