@@ -1,16 +1,18 @@
 package com.app.smjockey.Models;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by Akash Srivastava on 01-07-2016.
  */
-public class Streams {
+public class Streams implements Serializable {
 
 
     private String id;
     private String name;
     private ArrayList<String> tags;
+    private String uuid;
 
 
     public String getId() {
@@ -39,4 +41,11 @@ public class Streams {
         this.name = name;
     }
 
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 }

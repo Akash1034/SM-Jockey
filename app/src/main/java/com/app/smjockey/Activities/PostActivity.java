@@ -9,6 +9,7 @@ import android.util.Log;
 import com.app.smjockey.Adapters.ViewPagerAdapter;
 import com.app.smjockey.Fragments.LiveWallFragment;
 import com.app.smjockey.Fragments.PostFragment;
+import com.app.smjockey.Models.Streams;
 import com.app.smjockey.R;
 
 public class PostActivity extends AppCompatActivity {
@@ -25,7 +26,9 @@ public class PostActivity extends AppCompatActivity {
 
         Bundle bundle=getIntent().getExtras();
         Log.d(TAG,bundle.getString("Stream ID")+" "+bundle.getString("Stream Name"));
+        Streams streams= (Streams) bundle.getSerializable("Stream");
         PostFragment.setArgument(bundle);
+        LiveWallFragment.setArgument(bundle);
         viewPager=(ViewPager)findViewById(R.id.view_pager);
         setupViewPager(viewPager);
 
@@ -37,7 +40,7 @@ public class PostActivity extends AppCompatActivity {
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new PostFragment(), "Posts");
-        adapter.addFragment(new LiveWallFragment(), "LiveWall");
+        adapter.addFragment(new LiveWallFragment(), "LiveWallPosts");
         viewPager.setAdapter(adapter);
     }
 }

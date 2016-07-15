@@ -81,6 +81,7 @@ public class StreamAdapter extends RecyclerView.Adapter<StreamAdapter.ViewHolder
                     Intent intent=new Intent(mContext,PostActivity.class);
                     intent.putExtra("Stream ID",streamItem.getId());
                     intent.putExtra("Stream Name",streamItem.getName());
+                    intent.putExtra("Stream",streamItem);
                     mContext.startActivity(intent);
                     Toast.makeText(mContext,"Card Clicked",Toast.LENGTH_SHORT).show();
                 }

@@ -38,7 +38,6 @@ public class StreamActivity extends AppCompatActivity implements SwipeRefreshLay
 
 
     private List<Streams> streamsList;
-    private List<Streams> tempList;
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView.Adapter adapter;
@@ -52,14 +51,12 @@ public class StreamActivity extends AppCompatActivity implements SwipeRefreshLay
     ArrayList<String> tags;
     int page=1;
 
-    private Toolbar mToolbar;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stream);
 
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
 
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);

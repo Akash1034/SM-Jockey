@@ -21,6 +21,7 @@ import com.android.volley.VolleyError;
 import com.app.smjockey.Adapters.ClickListener;
 import com.app.smjockey.Adapters.PostAdapter;
 import com.app.smjockey.Models.Posts;
+import com.app.smjockey.Models.Streams;
 import com.app.smjockey.R;
 import com.app.smjockey.SwipeUtils.ItemTouchHelperAdapter;
 import com.app.smjockey.SwipeUtils.OnStartDragListener;
@@ -68,6 +69,7 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
 
     int offset=1;
 
+    Streams streamItem;
     SwipeRefreshLayout swipeRefreshLayout;
 
     private PostAdapter adapter;
@@ -104,7 +106,9 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
 
         user_token = settings.getString("user_token", null);
         streamID = bundles.getString("Stream ID");
-        Log.d(TAG, streamID);
+        streamItem= (Streams) bundles.getSerializable("Stream");
+        Log.d(TAG, streamItem.getId());
+
 
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
         if (recyclerView != null) {
@@ -122,14 +126,13 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
             recyclerView.setAdapter(adapter);
         }
 
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback((ItemTouchHelperAdapter) adapter);
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(recyclerView);
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.post(new Runnable() {
             @Override
             public void run() {
-                Log.d(TAG, "Inside Run");
                 getPosts();
             }
         });
@@ -166,7 +169,6 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
                         if (!isEndOfList) {
                             offset++;
                             getPosts();
-                            Log.d(TAG, "Getting data");
                         }
                         isEndOfList = true;
                     } else {
@@ -178,27 +180,12 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d(TAG,String.valueOf(adapter.getSelectedItemCount()));
 
-                /*List<Posts> postses=adapter.getSelectedItems();
-                for(int i=0;i<postses.size();i++) {
-                    Log.d(TAG, postses.get(i).getName());
-                    PostAdapter.sendPost(postses.get(i).getId());
 
-                    for(int j=0;j<postsList.size();j++) {
-                        if (postses.get(i).getId() == postsList.get(j).getId()) {
-                            postsList.remove(j);
-                            adapter.notifyItemRemoved(i);
-                            Log.d(TAG, "item removed");
-                        }
-                    }
-                }*/
                     for(Posts post : postsList)
                     {
-                        Log.d(TAG,post.getName());
                         if(post.isSelected())
                         {
-                            Log.d(TAG,post.getName()+"-"+post.isSelected());
                             sendPost(post.getId());
                         }
                     }
@@ -214,7 +201,38 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
             });
 
         }
+
+        getuuid();
         return rootView;
+    }
+
+    public void getuuid()
+    {
+        NetworkCalls.fetchData(new Responses() {
+            @Override
+            public void onSuccessResponse(JSONObject response) {
+
+                try {
+                    JSONArray resultsArray=new JSONObject(response.toString()).getJSONArray("results");
+                    JSONObject uuidObject=new JSONObject(String.valueOf(resultsArray.getJSONObject(0)));
+                    String uuid=uuidObject.getString("uuid");
+                    Log.d(TAG,uuid);
+                    streamItem.setUuid(uuid);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onSuccessResponse(String response) {
+
+            }
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        },Constants.posts_url+"/"+streamID+"/livewalls",user_token);
     }
 
     public void getPosts()
@@ -261,18 +279,15 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
                     case "photo":
                         entities = json.getJSONObject("entities");
                         image_url = entities.optString("full_url");
-                        Log.d(TAG, "Image url:" + image_url);
 
                         break;
                     case "tweet":
                         image_url = null;
-                        Log.d(TAG, "Tweet Image url:" + null);
                         break;
                     case "blog":
                         image_url = null;
                         entities = json.getJSONObject("entities");
                         text = "Title:" + entities.optString("title") + " Description:" + entities.optString("description");
-                        Log.d(TAG, "Blog text:" + text);
 
                         break;
                 }
@@ -297,24 +312,6 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
 
     public  void sendPost(String id)
     {
-        /*new NetworkCalls.postData(new Responses() {
-            @Override
-            public void onSuccessResponse(JSONObject response) {
-
-            }
-
-            @Override
-            public void onSuccessResponse(String response) {
-
-                Log.d(TAG,response.toString());
-            }
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d(TAG,error.getLocalizedMessage());
-
-            }
-        },"https://brands.eventifier.com/api/v1/streams/"+streamID+"/posts/"+id+"/livewall/",user_token);*/
         NetworkCalls networkCalls=new NetworkCalls();
         networkCalls.postData(new Responses() {
             @Override
@@ -338,10 +335,8 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
 */
                 for(int i=0;i<postsList.size();i++)
                 {
-                    Log.d(TAG,postsList.get(i).getName()+"a");
                     if(postsList.get(i).isSelected())
                     {
-                        Log.d(TAG,postsList.get(i).getName()+"-"+postsList.get(i).isSelected());
                         postsList.remove(postsList.get(i));
                         adapter.notifyItemRemoved(i);
                     }
@@ -364,10 +359,8 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
         // Make sure that we are currently visible
         if (this.isVisible()) {
             // If we are becoming invisible, then...
-            Log.d("PostFragment", "Visible");
 
             if (!isVisibleToUser) {
-                Log.d("PostFragment", "Not Visible");
                 // TODO stop audio playback
             }
         }

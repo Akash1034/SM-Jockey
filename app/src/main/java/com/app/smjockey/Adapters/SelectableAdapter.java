@@ -66,17 +66,5 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
         return count;
     }
 
-    /**
-     * Indicates the list of selected items
-     * @return List of selected items ids
-     */
-    /*public List<Posts> getSelectedItems() {
-        List<Posts> items=new ArrayList<>();
-        for(int i=0;i<postsList.size();i++)
-        {
-            if(postsList.get(i).isSelected())
-                items.add(postsList.get(i));
-        }
-        return items;
-    }*/
+
 }
