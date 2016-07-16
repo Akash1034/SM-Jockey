@@ -28,6 +28,8 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:+'
     compile 'com.android.support:cardview-v7:+'
     compile 'com.firebase:firebase-client-android:2.5.2+'
+    compile files('H:/akash work/projects/eventifier/SMJockey/libs/gson-2.2.2.jar')
+    compile 'org.glassfish:javax.annotation:10.0-b28'
 }
 
 

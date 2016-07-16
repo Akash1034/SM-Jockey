@@ -2,21 +2,30 @@ package com.app.smjockey.Fragments;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.app.smjockey.Adapters.LiveWallAdapter;
 import com.app.smjockey.Models.LiveWallPosts;
 import com.app.smjockey.Models.Streams;
 import com.app.smjockey.R;
 import com.app.smjockey.Utils.Constants;
+import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
-import com.firebase.client.MutableData;
-import com.firebase.client.Transaction;
-import com.firebase.client.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Akash Srivastava on 04-07-2016.
@@ -28,9 +37,13 @@ public class LiveWallFragment extends android.support.v4.app.Fragment {
 
     private String TAG=com.app.smjockey.Fragments.LiveWallFragment.class.getSimpleName();
 
+    private List<LiveWallPosts> liveWallPostsList;
     Streams streamItem;
-    public LiveWallFragment() {
-    }
+
+    //Creating Views
+    private RecyclerView recyclerView;
+    private RecyclerView.LayoutManager layoutManager;
+    private RecyclerView.Adapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,80 +55,95 @@ public class LiveWallFragment extends android.support.v4.app.Fragment {
                              Bundle savedInstanceState) {
         Firebase.setAndroidContext(getContext());
 
+        View rootView = inflater.inflate(R.layout.post_fragment, container, false);
+
+        recyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerView);
+        recyclerView.setHasFixedSize(true);
+        layoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(layoutManager);
+
+        liveWallPostsList=new ArrayList<>();
+        adapter=new LiveWallAdapter(getActivity(),liveWallPostsList);
+        recyclerView.setAdapter(adapter);
         Handler handler=new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 streamItem= (Streams) bundles.getSerializable("Stream");
                 Log.d(TAG,streamItem.getId()+streamItem.getUuid());
-                final Firebase firebase=new Firebase(Constants.livewall_url+streamItem.getUuid()+"/data");
-                firebase.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot snapshot) {
-
-
-                        for (final DataSnapshot postSnapshot: snapshot.getChildren()) {
-                            if (postSnapshot.child("type").getValue().equals("tweet")) {
-                                firebase.child(postSnapshot.getKey()).child("tweet~inserted_at").runTransaction(new Transaction.Handler() {
-                                    public Transaction.Result doTransaction(MutableData mutableData) {
-                                        mutableData.setValue(null); // This removes the node.
-                                        return Transaction.success(mutableData);
-                                    }
-
-                                    public void onComplete(FirebaseError error, boolean b, DataSnapshot data) {
-                                        // Handle completion
-                                        LiveWallPosts posts=postSnapshot.getValue(LiveWallPosts.class);
-                                        Log.d(TAG,"Tweet Post:"+posts.getId()+"-"+posts.getType());
-                                    }
-                                });
-                            }
-                            else if(postSnapshot.child("type").getValue().equals("photo"))
-                            {
-                                Log.d(TAG, String.valueOf(postSnapshot.child("photo~inserted_at").getValue()));
-                                firebase.child(postSnapshot.getKey()).child("photo~inserted_at").runTransaction(new Transaction.Handler() {
-                                    public Transaction.Result doTransaction(MutableData mutableData) {
-                                        mutableData.setValue(null);
-                                        return Transaction.success(mutableData);
-                                    }
-                                    public void onComplete(FirebaseError error, boolean b, DataSnapshot data) {
-
-                                        Log.d(TAG,"After:"+String.valueOf(postSnapshot.child("photo~inserted_at").getValue()));
-                                        LiveWallPosts posts=postSnapshot.getValue(LiveWallPosts.class);
-                                        Log.d(TAG,"Photo Post:"+posts.getId()+"-"+posts.getType());
-                                    }
-                                });
-
-
-                                //        Posts posts=postSnapshot.getValue(Posts.class);
-
-                                //   Log.d(TAG,posts.getId()+"-"+posts.getType());
-
-
-                            }
-                        }
-                    }
-                    @Override
-                    public void onCancelled(FirebaseError firebaseError) {
-                        System.out.println("The read failed: " + firebaseError.getMessage());
-                    }
-                });
+                getLiveWall();
             }
-        },2000);
+        },2500);
 
 
+        return rootView;
+    }
 
-
-
-
-
-
-
-        return inflater.inflate(R.layout.livewall_fragment, container, false);
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(liveWallPostsList!=null)
+            liveWallPostsList.clear();
     }
 
     public void getLiveWall()
     {
+        final Firebase firebase=new Firebase(Constants.livewall_url+streamItem.getUuid()+"/data");
 
+        firebase.addChildEventListener(new ChildEventListener() {
+            // Retrieve new posts as they are added to the database
+            @Override
+            public void onChildAdded(final DataSnapshot snapshot, String previousChildKey) {
+
+                HashMap value=snapshot.getValue(HashMap.class);
+                JSONObject jsonObject=new JSONObject(value);
+
+                Log.d(TAG,"json:"+jsonObject.toString());
+                Gson gson=new GsonBuilder().create();
+                LiveWallPosts liveWallPosts=gson.fromJson(jsonObject.toString(),LiveWallPosts.class);
+                liveWallPostsList.add(liveWallPosts);
+                adapter.notifyDataSetChanged();
+
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                Log.d(TAG,"Child Removed:"+ dataSnapshot.child("id").getValue());
+                for(int i=0;i<liveWallPostsList.size();i++)
+                {
+                    Log.d(TAG,"Inside Removed:"+liveWallPostsList.get(i).getId()+"-"+ dataSnapshot.child("id").getValue());
+                    Long id=(Long)dataSnapshot.child("id").getValue();
+
+                    Log.d(TAG, String.valueOf(liveWallPostsList.get(i).getId().equals(String.valueOf(id))));
+                    if(liveWallPostsList.get(i).getId().equals(String.valueOf(id)))
+                    {
+
+                        Log.d(TAG,"Inside:"+liveWallPostsList.get(i).getId()+"-"+ dataSnapshot.child("id").getValue());
+                        liveWallPostsList.remove(i);
+                        adapter.notifyDataSetChanged();
+                    }
+                }
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+            //... ChildEventListener also defines onChildChanged, onChildRemoved,
+            //    onChildMoved and onCanceled, covered in later sections.
+        });
 
 
     }
@@ -139,3 +167,4 @@ public class LiveWallFragment extends android.support.v4.app.Fragment {
     }
 
 }
+

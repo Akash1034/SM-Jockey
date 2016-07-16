@@ -8,14 +8,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.ListView;
 
 import com.android.volley.VolleyError;
 import com.app.smjockey.Adapters.ClickListener;
@@ -23,7 +18,6 @@ import com.app.smjockey.Adapters.PostAdapter;
 import com.app.smjockey.Models.Posts;
 import com.app.smjockey.Models.Streams;
 import com.app.smjockey.R;
-import com.app.smjockey.SwipeUtils.ItemTouchHelperAdapter;
 import com.app.smjockey.SwipeUtils.OnStartDragListener;
 import com.app.smjockey.SwipeUtils.SimpleItemTouchHelperCallback;
 import com.app.smjockey.Utils.Constants;
@@ -201,7 +195,7 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
             });
 
         }
-
+        getPosts();
         getuuid();
         return rootView;
     }

@@ -1,16 +1,14 @@
 package com.app.smjockey.Models;
 
-/**
- * Created by Akash Srivastava on 15-07-2016.
- */
-
 import com.fasterxml.jackson.annotation.JsonCreator;
+
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by Akash Srivastava on 13-07-2016.
  */
-public class LiveWallPosts {
+public class LiveWallPosts implements Serializable{
 
 
     public Account account;
