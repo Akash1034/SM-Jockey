@@ -7,14 +7,12 @@ import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.app.smjockey.Fragments.PostFragment;
@@ -24,10 +22,6 @@ import com.app.smjockey.SwipeUtils.ItemTouchHelperAdapter;
 import com.app.smjockey.SwipeUtils.ItemTouchHelperViewHolder;
 import com.app.smjockey.Utils.PostImageView;
 import com.app.smjockey.Volley.AppController;
-import com.app.smjockey.Volley.NetworkCalls;
-import com.app.smjockey.Volley.Responses;
-
-import org.json.JSONObject;
 
 import java.util.List;
 
@@ -44,7 +38,7 @@ public class PostAdapter extends SelectableAdapter<PostAdapter.ViewHolder>
     private LayoutInflater inflater;
     private List<Posts> postsList;
     String id;
-    int x;
+    public static int longClick=0;
 
     ClickListener clickListener;
     FloatingActionButton button;
@@ -203,6 +197,7 @@ public class PostAdapter extends SelectableAdapter<PostAdapter.ViewHolder>
         public boolean onLongClick(View v) {
             if (listener != null) {
                 button.setVisibility(View.VISIBLE);
+                longClick=1;
                 //     Log.d("After Long Click",postItem.getName());
                 return listener.onItemLongClicked(getAdapterPosition());
             }

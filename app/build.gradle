@@ -30,6 +30,11 @@ dependencies {
     compile 'com.firebase:firebase-client-android:2.5.2+'
     compile files('H:/akash work/projects/eventifier/SMJockey/libs/gson-2.2.2.jar')
     compile 'org.glassfish:javax.annotation:10.0-b28'
+    compile (
+            [group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.4.1'],
+            [group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.4.1'],
+            [group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.4.1']
+    )
 }
 
 

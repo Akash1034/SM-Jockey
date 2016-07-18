@@ -1,9 +1,9 @@
 package com.app.smjockey.Activities;
 
+import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 
 import com.app.smjockey.Adapters.ViewPagerAdapter;
@@ -18,6 +18,7 @@ public class PostActivity extends AppCompatActivity {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,4 +44,10 @@ public class PostActivity extends AppCompatActivity {
         adapter.addFragment(new LiveWallFragment(), "LiveWallPosts");
         viewPager.setAdapter(adapter);
     }
+
+    public interface OnBackPressedListener {
+        void onBackPressed();
+    }
+
+
 }

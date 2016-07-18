@@ -14,15 +14,15 @@ import com.app.smjockey.Models.LiveWallPosts;
 import com.app.smjockey.Models.Streams;
 import com.app.smjockey.R;
 import com.app.smjockey.Utils.Constants;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -73,7 +73,7 @@ public class LiveWallFragment extends android.support.v4.app.Fragment {
                 Log.d(TAG,streamItem.getId()+streamItem.getUuid());
                 getLiveWall();
             }
-        },2500);
+        },3000);
 
 
         return rootView;
@@ -98,12 +98,42 @@ public class LiveWallFragment extends android.support.v4.app.Fragment {
                 HashMap value=snapshot.getValue(HashMap.class);
                 JSONObject jsonObject=new JSONObject(value);
 
-                Log.d(TAG,"json:"+jsonObject.toString());
-                Gson gson=new GsonBuilder().create();
-                LiveWallPosts liveWallPosts=gson.fromJson(jsonObject.toString(),LiveWallPosts.class);
-                liveWallPostsList.add(liveWallPosts);
-                adapter.notifyDataSetChanged();
+                Log.d(TAG,"on:"+jsonObject.toString());
 
+                if(snapshot.child("type").getValue().equals("photo")) {
+
+                    jsonObject.remove("photo~inserted_at");
+                    ObjectMapper objectMapper=new ObjectMapper();
+                    LiveWallPosts liveWallPosts = null;
+                    try {
+                        liveWallPosts = objectMapper.readValue(String.valueOf(jsonObject),LiveWallPosts.class);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Log.d(TAG, liveWallPosts.getAccount().getName());
+                    liveWallPostsList.add(0,liveWallPosts);
+                }
+
+                else if(snapshot.child("type").getValue().equals("tweet"))
+                {
+                    jsonObject.remove("tweet~inserted_at");
+                    ObjectMapper objectMapper=new ObjectMapper();
+                    LiveWallPosts liveWallPosts = null;
+                    try {
+                        liveWallPosts = objectMapper.readValue(String.valueOf(jsonObject),LiveWallPosts.class);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Log.d(TAG,"YEah:"+liveWallPosts.getAccount().getName());
+                    liveWallPostsList.add(0,liveWallPosts);
+                }
+                adapter.notifyDataSetChanged();
+                recyclerView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        recyclerView.smoothScrollToPosition(0);
+                    }
+                });
 
             }
 
