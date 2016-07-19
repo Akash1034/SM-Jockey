@@ -119,4 +119,37 @@ public class NetworkCalls {
 
     }
 
+    public static void deleteData(final Responses responses, String url, final String user_token) {
+        StringRequest putRequest = new StringRequest(Request.Method.DELETE, url,
+                new Response.Listener<String>()
+                {
+                    @Override
+                    public void onResponse(String response) {
+                        // response
+                        responses.onSuccessResponse(response);
+                    }
+                },
+                new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        responses.onErrorResponse(error);
+                    }
+                }
+        ) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<String, String>();
+                headers.put("Content-Type", "application/json");
+                headers.put("Authorization", "Token " + user_token);
+                return headers;
+            }
+
+        };
+
+        AppController.getInstance().addToRequestQueue(putRequest, Constants.GET_REQUEST_TAG);
+
+    }
+
 }

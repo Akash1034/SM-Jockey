@@ -3,7 +3,6 @@ package com.app.smjockey.Fragments;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,10 +11,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.android.volley.VolleyError;
-import com.app.smjockey.Activities.PostActivity;
 import com.app.smjockey.Adapters.ClickListener;
 import com.app.smjockey.Adapters.PostAdapter;
 import com.app.smjockey.Models.Posts;
@@ -38,7 +35,7 @@ import java.util.List;
  * Created by Akash Srivastava on 04-07-2016.
  */
 public class PostFragment extends android.support.v4.app.Fragment implements OnStartDragListener, SwipeRefreshLayout.OnRefreshListener ,ClickListener
-        ,PostActivity.OnBackPressedListener{
+        {
 
     static String user_token=null;
     static String streamID;
@@ -178,6 +175,7 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
                 }
             });
 
+
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -202,7 +200,6 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
             });
 
         }
-        getPosts();
         getuuid();
         return rootView;
     }
@@ -410,17 +407,5 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
     }
 
 
-    @Override
-    public void onBackPressed() {
-        List<Fragment> fragmentList = getFragmentManager().getFragments();
-        Toast.makeText(getActivity(), "Ge", Toast.LENGTH_SHORT).show();
-        if (fragmentList != null) {
 
-            for (Fragment fragment : fragmentList) {
-                if (fragment instanceof PostActivity.OnBackPressedListener) {
-                    ((PostActivity.OnBackPressedListener) fragment).onBackPressed();
-                }
-            }
-        }
-    }
 }

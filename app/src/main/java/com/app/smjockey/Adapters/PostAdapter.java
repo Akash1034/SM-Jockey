@@ -140,6 +140,8 @@ public class PostAdapter extends SelectableAdapter<PostAdapter.ViewHolder>
     }
 
 
+
+
     class ViewHolder extends RecyclerView.ViewHolder implements
             ItemTouchHelperViewHolder,View.OnClickListener, View.OnLongClickListener{
         TextView name;

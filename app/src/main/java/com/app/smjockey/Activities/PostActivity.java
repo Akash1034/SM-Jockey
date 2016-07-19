@@ -45,9 +45,7 @@ public class PostActivity extends AppCompatActivity {
         viewPager.setAdapter(adapter);
     }
 
-    public interface OnBackPressedListener {
-        void onBackPressed();
-    }
+
 
 
 }

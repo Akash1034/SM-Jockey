@@ -1,7 +1,10 @@
 package com.app.smjockey.Fragments;
 
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -9,11 +12,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.android.volley.VolleyError;
 import com.app.smjockey.Adapters.LiveWallAdapter;
 import com.app.smjockey.Models.LiveWallPosts;
 import com.app.smjockey.Models.Streams;
 import com.app.smjockey.R;
 import com.app.smjockey.Utils.Constants;
+import com.app.smjockey.Volley.NetworkCalls;
+import com.app.smjockey.Volley.Responses;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
@@ -40,6 +46,12 @@ public class LiveWallFragment extends android.support.v4.app.Fragment {
     private List<LiveWallPosts> liveWallPostsList;
     Streams streamItem;
 
+    static String user_token=null;
+
+
+    SharedPreferences settings;
+
+
     //Creating Views
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
@@ -54,6 +66,10 @@ public class LiveWallFragment extends android.support.v4.app.Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Firebase.setAndroidContext(getContext());
+
+        settings = getActivity().getSharedPreferences(Constants.TOKEN_FILE, 0);
+
+        user_token = settings.getString("user_token", null);
 
         View rootView = inflater.inflate(R.layout.post_fragment, container, false);
 
@@ -74,6 +90,63 @@ public class LiveWallFragment extends android.support.v4.app.Fragment {
                 getLiveWall();
             }
         },3000);
+
+        recyclerView.addOnItemTouchListener(
+                new LiveWallAdapter(getActivity(), new LiveWallAdapter.OnItemClickListener() {
+                    @Override public void onItemClick(View view, final int position) {
+                        // TODO Handle item
+                        Log.d(TAG, String.valueOf(position));
+
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                                getActivity());
+
+                        // set title
+                        alertDialogBuilder.setTitle(liveWallPostsList.get(position).getAccount().getName());
+
+                        // set dialog message
+                        alertDialogBuilder
+                                .setMessage("LivePost")
+                                .setPositiveButton("Show Now",new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog,int id) {
+                                        // if this button is clicked, close
+                                        // current activity
+                                        getActivity().finish();
+                                    }
+                                })
+                                .setNegativeButton("Remove",new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        // if this button is clicked, just close
+                                        // the dialog box and do nothing
+                                        NetworkCalls.deleteData(new Responses() {
+                                            @Override
+                                            public void onSuccessResponse(JSONObject response) {
+                                                liveWallPostsList.remove(position);
+
+                                                adapter.notifyDataSetChanged();
+                                            }
+
+                                            @Override
+                                            public void onSuccessResponse(String response) {
+
+                                            }
+
+                                            @Override
+                                            public void onErrorResponse(VolleyError error) {
+
+                                            }
+                                        },"https://brands.eventifier.com/api/v1/streams/"+streamItem.getId()+"/posts/"+liveWallPostsList.get(position).getId()+"/livewall/",user_token);
+
+                                    }
+                                });
+
+                        // create alert dialog
+                        AlertDialog alertDialog = alertDialogBuilder.create();
+
+                        // show it
+                        alertDialog.show();
+                    }
+                })
+        );
 
 
         return rootView;
@@ -134,6 +207,7 @@ public class LiveWallFragment extends android.support.v4.app.Fragment {
                         recyclerView.smoothScrollToPosition(0);
                     }
                 });
+
 
             }
 
