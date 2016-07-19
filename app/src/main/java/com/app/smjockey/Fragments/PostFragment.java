@@ -331,6 +331,7 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
                     }
                 }
 */
+                Log.d(TAG,"status:"+response);
                 for(int i=0;i<postsList.size();i++)
                 {
                     if(postsList.get(i).isSelected())
