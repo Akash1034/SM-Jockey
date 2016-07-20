@@ -29,13 +29,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Created by Akash Srivastava on 04-07-2016.
  */
 public class PostFragment extends android.support.v4.app.Fragment implements OnStartDragListener, SwipeRefreshLayout.OnRefreshListener ,ClickListener
-        {
+{
 
     static String user_token=null;
     static String streamID;
@@ -75,6 +76,9 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
     private ItemTouchHelper mItemTouchHelper;
 
     static Bundle bundles;
+
+
+
 
     public PostFragment() {
         // Required empty public constructor
@@ -119,7 +123,7 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
 
         postsList = new ArrayList<>();
 
-        adapter=new PostAdapter(getActivity(),postsList,clickListener,button);
+        adapter=new PostAdapter(getActivity(), Collections.<Posts>emptyList(),clickListener,button);
         if (recyclerView != null) {
             recyclerView.setAdapter(adapter);
         }
@@ -304,7 +308,7 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        adapter.notifyDataSetChanged();
+        adapter.addItems(postsList);
 
     }
 
@@ -337,10 +341,10 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
                     if(postsList.get(i).isSelected())
                     {
                         postsList.remove(postsList.get(i));
-                        adapter.notifyItemRemoved(i);
+
                     }
                 }
-                PostAdapter.longClick=0;
+                adapter.addItems(postsList);
 
 
             }
@@ -389,22 +393,22 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
     @Override
     public void onItemClicked(int position) {
 
-        if(PostAdapter.longClick==1)
-        toggleSelection(position);
+//        if(PostAdapter.longClick==1)
+//        toggleSelection(position);
 
     }
 
     @Override
     public boolean onItemLongClicked(int position) {
         // Log.d("Toggle Long Click",postsList.get(position).getName());
-        toggleSelection(position);
+//        toggleSelection(position);
         return true;
     }
 
     private void toggleSelection(int position) {
         //Log.d("Toggle Click",postsList.get(position).getName());
 
-        adapter.toggleSelection (position);
+//        adapter.toggleSelection (position);
     }
 
 

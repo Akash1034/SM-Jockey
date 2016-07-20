@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
-import com.app.smjockey.Fragments.PostFragment;
+import com.app.smjockey.Activities.PostActivity;
 import com.app.smjockey.Models.Posts;
 import com.app.smjockey.R;
 import com.app.smjockey.SwipeUtils.ItemTouchHelperAdapter;
@@ -29,8 +29,8 @@ import java.util.List;
 
  * Created by Akash Srivastava on 05-07-2016.
  */
-public class PostAdapter extends SelectableAdapter<PostAdapter.ViewHolder>
-        implements ItemTouchHelperAdapter {
+public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> implements ItemTouchHelperAdapter
+        {
 
 
     private String TAG=com.app.smjockey.Adapters.PostAdapter.class.getSimpleName();
@@ -38,7 +38,6 @@ public class PostAdapter extends SelectableAdapter<PostAdapter.ViewHolder>
     private LayoutInflater inflater;
     private List<Posts> postsList;
     String id;
-    public static int longClick=0;
 
     ClickListener clickListener;
     FloatingActionButton button;
@@ -46,7 +45,6 @@ public class PostAdapter extends SelectableAdapter<PostAdapter.ViewHolder>
     ImageLoader imageLoader= AppController.getInstance().getImageLoader();
 
     public PostAdapter(Context context, List<Posts> postsList, ClickListener clickListener,FloatingActionButton button) {
-        super(postsList);
         this.context = context;
         this.postsList = postsList;
         this.clickListener=clickListener;
@@ -107,7 +105,7 @@ public class PostAdapter extends SelectableAdapter<PostAdapter.ViewHolder>
         } else {
             holder.postImageView.setVisibility(View.GONE);
         }
-        if(isSelected(position)) {
+        if(postItem.isSelected()) {
             holder.selectedOverlay.setBackgroundColor(context.getResources().getColor(R.color.colorPrimaryDark));
         }
         else
@@ -133,11 +131,20 @@ public class PostAdapter extends SelectableAdapter<PostAdapter.ViewHolder>
 
     @Override
     public void onItemDismiss(int position) {
-        id=postsList.get(position).getId();
-        postsList.remove(position);
-        new PostFragment().sendPost(postsList.get(position).getId());
+        Posts posts = postsList.get(position);
+        id=posts.getId();
+        posts.setSelected(true);
+//        postsList.remove(position);
+        ((PostActivity)context).sendDataToPostFragment(posts.getId());
         notifyItemRemoved(position);
     }
+
+    public void addItems(List<Posts> postsList1){
+
+        postsList = postsList1;
+        notifyDataSetChanged();
+    }
+
 
 
 
@@ -156,6 +163,7 @@ public class PostAdapter extends SelectableAdapter<PostAdapter.ViewHolder>
 
         public ViewHolder(final View itemView, ClickListener listener) {
             super(itemView);
+
 
             this.listener = listener;
             name = (TextView) itemView.findViewById(R.id.name);
@@ -189,7 +197,17 @@ public class PostAdapter extends SelectableAdapter<PostAdapter.ViewHolder>
 
         @Override
         public void onClick(View v) {
+            if (getAdapterPosition() != -1) {
+                postItem = postsList.get(getAdapterPosition());
+            }
             if (listener != null) {
+                if(postItem.isSelected()){
+                    postItem.setSelected(false);
+                }else{
+                    postItem.setSelected(true);
+                }
+
+                notifyItemChanged(getAdapterPosition());
                 listener.onItemClicked(getAdapterPosition());
 //                Log.d("After click",postItem.getName());
             }
@@ -197,10 +215,21 @@ public class PostAdapter extends SelectableAdapter<PostAdapter.ViewHolder>
 
         @Override
         public boolean onLongClick(View v) {
+            if (getAdapterPosition() != -1) {
+                postItem = postsList.get(getAdapterPosition());
+            }
+
             if (listener != null) {
                 button.setVisibility(View.VISIBLE);
-                longClick=1;
+//                longClick=1;
                 //     Log.d("After Long Click",postItem.getName());
+                if(postItem.isSelected()){
+                    postItem.setSelected(false);
+                }else{
+                    postItem.setSelected(true);
+                }
+
+                notifyItemChanged(getAdapterPosition());
                 return listener.onItemLongClicked(getAdapterPosition());
             }
             return false;
@@ -209,4 +238,6 @@ public class PostAdapter extends SelectableAdapter<PostAdapter.ViewHolder>
 
 
     }
+
+
 }

@@ -87,7 +87,7 @@ public class Posts {
     }
 
     public boolean isSelected() {
-        return selected;
+        return this.selected;
     }
 
     public void setSelected(boolean selected) {

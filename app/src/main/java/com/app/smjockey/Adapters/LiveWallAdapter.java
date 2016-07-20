@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
@@ -30,6 +31,7 @@ public class LiveWallAdapter extends RecyclerView.Adapter<LiveWallAdapter.ViewHo
     private List<LiveWallPosts> liveWallPostList;
 
     private OnItemClickListener mListener;
+    LinearLayout firstLayout;
 
 
     GestureDetector mGestureDetector;
@@ -37,9 +39,10 @@ public class LiveWallAdapter extends RecyclerView.Adapter<LiveWallAdapter.ViewHo
 
     ImageLoader imageLoader= AppController.getInstance().getImageLoader();
 
-    public LiveWallAdapter(Context context, List<LiveWallPosts> liveWallPostList) {
+    public LiveWallAdapter(Context context, List<LiveWallPosts> liveWallPostList,LinearLayout firstLayout) {
         this.context = context;
         this.liveWallPostList=liveWallPostList;
+        this.firstLayout=firstLayout;
     }
 
     @Override
@@ -138,6 +141,7 @@ public class LiveWallAdapter extends RecyclerView.Adapter<LiveWallAdapter.ViewHo
     }
 
 
+
     class ViewHolder extends RecyclerView.ViewHolder {
         TextView name;
         TextView username;
@@ -165,6 +169,7 @@ public class LiveWallAdapter extends RecyclerView.Adapter<LiveWallAdapter.ViewHo
 
         }
     }
+
 
 
 

@@ -18,6 +18,7 @@ public class PostActivity extends AppCompatActivity {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    private PostFragment postFragment;
 
 
     @Override
@@ -40,12 +41,18 @@ public class PostActivity extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new PostFragment(), "Posts");
+        postFragment = new PostFragment();
+        adapter.addFragment(postFragment, "Posts");
         adapter.addFragment(new LiveWallFragment(), "LiveWallPosts");
         viewPager.setAdapter(adapter);
     }
 
 
+    public void sendDataToPostFragment(String id){
+        if(postFragment != null){
+            postFragment.sendPost(id);
+        }
+    }
 
 
 }

@@ -7,17 +7,25 @@ import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.app.smjockey.Adapters.LiveWallAdapter;
 import com.app.smjockey.Models.LiveWallPosts;
 import com.app.smjockey.Models.Streams;
 import com.app.smjockey.R;
 import com.app.smjockey.Utils.Constants;
+import com.app.smjockey.Utils.PostImageView;
+import com.app.smjockey.Volley.AppController;
 import com.app.smjockey.Volley.NetworkCalls;
 import com.app.smjockey.Volley.Responses;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,7 +44,7 @@ import java.util.List;
 /**
  * Created by Akash Srivastava on 04-07-2016.
  */
-public class LiveWallFragment extends android.support.v4.app.Fragment {
+public class LiveWallFragment extends android.support.v4.app.Fragment implements LiveWallAdapter.OnItemClickListener {
 
 
     static Bundle bundles;
@@ -56,6 +64,18 @@ public class LiveWallFragment extends android.support.v4.app.Fragment {
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private RecyclerView.Adapter adapter;
+    public TextView textName;
+    public TextView textUsername;
+    public TextView post_text;
+    public NetworkImageView profilePic;
+    public PostImageView postImageView;
+    public LinearLayout selectedOverlay;
+    public LinearLayout firstLayout;
+    public Button removeButton;
+    ImageLoader imageLoader;
+    LiveWallPosts liveWallPostsTempItem;
+    int tempPosition;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,7 +91,16 @@ public class LiveWallFragment extends android.support.v4.app.Fragment {
 
         user_token = settings.getString("user_token", null);
 
-        View rootView = inflater.inflate(R.layout.post_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.livewall_fragment, container, false);
+
+        textName = (TextView)rootView.findViewById(R.id.name);
+        textUsername = (TextView)rootView.findViewById(R.id.username);
+        post_text = (TextView)rootView.findViewById(R.id.post_text);
+        profilePic = (NetworkImageView)rootView.findViewById(R.id.profilePic);
+        postImageView = (PostImageView)rootView.findViewById(R.id.postImage);
+        selectedOverlay = (LinearLayout)rootView.findViewById(R.id.selected_overlay);
+        firstLayout=(LinearLayout)rootView.findViewById(R.id.firstLayout);
+        removeButton=(Button)rootView.findViewById(R.id.removeButton);
 
         recyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
@@ -79,7 +108,7 @@ public class LiveWallFragment extends android.support.v4.app.Fragment {
         recyclerView.setLayoutManager(layoutManager);
 
         liveWallPostsList=new ArrayList<>();
-        adapter=new LiveWallAdapter(getActivity(),liveWallPostsList);
+        adapter=new LiveWallAdapter(getActivity(),liveWallPostsList,firstLayout);
         recyclerView.setAdapter(adapter);
         Handler handler=new Handler();
         handler.postDelayed(new Runnable() {
@@ -91,13 +120,15 @@ public class LiveWallFragment extends android.support.v4.app.Fragment {
             }
         },3000);
 
+
         recyclerView.addOnItemTouchListener(
                 new LiveWallAdapter(getActivity(), new LiveWallAdapter.OnItemClickListener() {
                     @Override public void onItemClick(View view, final int position) {
                         // TODO Handle item
-                        Log.d(TAG, String.valueOf(position));
 
-                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+
+
+                        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                                 getActivity());
 
                         // set title
@@ -108,9 +139,89 @@ public class LiveWallFragment extends android.support.v4.app.Fragment {
                                 .setMessage("LivePost")
                                 .setPositiveButton("Show Now",new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog,int id) {
+
+                                        final LiveWallPosts liveWallPostItem=liveWallPostsList.get(position);
+                                        if(firstLayout.getVisibility()==View.VISIBLE) {
+                                            Firebase firebase = new Firebase(Constants.livewall_url + streamItem.getUuid()).child("pin");
+                                            firebase.setValue(liveWallPostItem.getP_id());
+                                            adapter.notifyDataSetChanged();
+                                        }
+                                        else if (firstLayout.getVisibility()==View.GONE)
+                                        {
+                                            firstLayout.setVisibility(View.VISIBLE);
+                                            Firebase firebase = new Firebase(Constants.livewall_url + streamItem.getUuid()).child("pin");
+                                            firebase.setValue(liveWallPostItem.getP_id());
+                                            adapter.notifyDataSetChanged();
+                                        }
+
+                                        if(imageLoader==null)
+                                            imageLoader= AppController.getInstance().getImageLoader();
+
+
+
+                                        textName.setText(liveWallPostItem.getAccount().getName());
+
+
+                                        textUsername.setText(liveWallPostItem.getAccount().getUsername());
+
+                                        // Chcek for empty status message
+                                        if (!TextUtils.isEmpty(liveWallPostItem.getText())) {
+                                            post_text.setText(liveWallPostItem.getText());
+                                            post_text.setVisibility(View.VISIBLE);
+                                        } else {
+                                            // status is empty, remove from view
+                                            post_text.setVisibility(View.GONE);
+                                        }
+
+                                        // Checking for null feed url
+
+
+                                        // user profile pic
+                                        profilePic.setImageUrl(liveWallPostItem.getAccount().getProfile_image(), imageLoader);
+
+                                        // Feed image
+                                        if (liveWallPostItem.getJson().getEntities().getFull_url() != null) {
+                                            postImageView.setImageUrl(liveWallPostItem.getJson().getEntities().getFull_url(), imageLoader);
+                                            postImageView.setVisibility(View.VISIBLE);
+                                            postImageView.setResponseObserver(new PostImageView.ResponseObserver() {
+                                                @Override
+                                                public void onError() {
+
+                                                }
+
+                                                @Override
+                                                public void onSuccess() {
+
+                                                }
+                                            });
+                                        } else {
+                                            postImageView.setVisibility(View.GONE);
+                                        }
+
+
+
+                                        /*Firebase firebase = new Firebase(Constants.livewall_url + streamItem.getUuid()).child("pin");
+                                        firebase.setValue(liveWallPostItem.getP_id());
+                                        liveWallPostsList.remove(liveWallPostItem);
+                                        liveWallPostsTempItem=liveWallPostsList.get(position);
+                                        Log.d(TAG,"da"+liveWallPostsTempItem.getAccount().getName());
+                                        tempPosition=position;
+                                        adapter.notifyDataSetChanged();*/
+
+                                        removeButton.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+
+                                                Firebase firebase=new Firebase(Constants.livewall_url+streamItem.getUuid());
+                                                firebase.child("pin").setValue(null);
+                                                firstLayout.setVisibility(View.GONE);
+                                            }
+                                        });
                                         // if this button is clicked, close
                                         // current activity
-                                        getActivity().finish();
+
+
+
                                     }
                                 })
                                 .setNegativeButton("Remove",new DialogInterface.OnClickListener() {
@@ -147,6 +258,7 @@ public class LiveWallFragment extends android.support.v4.app.Fragment {
                     }
                 })
         );
+
 
 
         return rootView;
@@ -270,5 +382,9 @@ public class LiveWallFragment extends android.support.v4.app.Fragment {
         bundles=bundle;
     }
 
+    @Override
+    public void onItemClick(View view, int position) {
+        Log.d(TAG, String.valueOf(position));
+    }
 }
 
