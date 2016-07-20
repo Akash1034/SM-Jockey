@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.app.smjockey.Adapters.ViewPagerAdapter;
+import com.app.smjockey.Fragments.AnnouncementFragment;
 import com.app.smjockey.Fragments.LiveWallFragment;
 import com.app.smjockey.Fragments.PostFragment;
 import com.app.smjockey.Models.Streams;
@@ -19,6 +20,8 @@ public class PostActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private PostFragment postFragment;
+    private AnnouncementFragment announcementFragment;
+    private LiveWallFragment liveWallFragment;
 
 
     @Override
@@ -31,6 +34,7 @@ public class PostActivity extends AppCompatActivity {
         Streams streams= (Streams) bundle.getSerializable("Stream");
         PostFragment.setArgument(bundle);
         LiveWallFragment.setArgument(bundle);
+        AnnouncementFragment.setArgument(bundle);
         viewPager=(ViewPager)findViewById(R.id.view_pager);
         setupViewPager(viewPager);
 
@@ -42,8 +46,11 @@ public class PostActivity extends AppCompatActivity {
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         postFragment = new PostFragment();
+        announcementFragment=new AnnouncementFragment();
+        liveWallFragment=new LiveWallFragment();
         adapter.addFragment(postFragment, "Posts");
-        adapter.addFragment(new LiveWallFragment(), "LiveWallPosts");
+        adapter.addFragment(liveWallFragment, "LiveWall");
+        adapter.addFragment(announcementFragment,"Announcement");
         viewPager.setAdapter(adapter);
     }
 

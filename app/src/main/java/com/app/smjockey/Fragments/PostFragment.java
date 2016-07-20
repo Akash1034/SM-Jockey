@@ -336,14 +336,7 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
                 }
 */
                 Log.d(TAG,"status:"+response);
-                for(int i=0;i<postsList.size();i++)
-                {
-                    if(postsList.get(i).isSelected())
-                    {
-                        postsList.remove(postsList.get(i));
 
-                    }
-                }
                 adapter.addItems(postsList);
 
 
@@ -393,6 +386,8 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
     @Override
     public void onItemClicked(int position) {
 
+        Log.d(TAG,"dada");
+        postsList.get(position).setSelected(true);
 //        if(PostAdapter.longClick==1)
 //        toggleSelection(position);
 
