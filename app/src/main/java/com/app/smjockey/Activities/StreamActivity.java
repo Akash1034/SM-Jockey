@@ -1,9 +1,9 @@
 package com.app.smjockey.Activities;
 
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -12,14 +12,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
 import com.app.smjockey.Adapters.StreamAdapter;
 import com.app.smjockey.Models.Streams;
 import com.app.smjockey.R;
 import com.app.smjockey.Utils.Constants;
 import com.app.smjockey.Volley.NetworkCalls;
 import com.app.smjockey.Volley.Responses;
-import com.firebase.client.Firebase;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -190,7 +188,7 @@ public class StreamActivity extends AppCompatActivity implements SwipeRefreshLay
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                VolleyLog.d(TAG, "Volley Error: " + error.toString());
+                Log.d(TAG, "Volley Error: " + error.toString());
                 page--;
                 swipeRefreshLayout.setRefreshing(false);
             }

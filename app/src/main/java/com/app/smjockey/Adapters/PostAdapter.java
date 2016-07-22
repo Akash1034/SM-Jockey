@@ -4,9 +4,9 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.app.smjockey.Activities.PostActivity;
+import com.app.smjockey.Fragments.PostFragment;
 import com.app.smjockey.Models.Posts;
 import com.app.smjockey.R;
 import com.app.smjockey.SwipeUtils.ItemTouchHelperAdapter;
@@ -40,15 +41,15 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> im
     String id;
 
     ClickListener clickListener;
-    FloatingActionButton button;
+    PostFragment postFragment;
 
     ImageLoader imageLoader= AppController.getInstance().getImageLoader();
 
-    public PostAdapter(Context context, List<Posts> postsList, ClickListener clickListener,FloatingActionButton button) {
+    public PostAdapter(Context context, List<Posts> postsList, ClickListener clickListener, PostFragment postFragment) {
         this.context = context;
         this.postsList = postsList;
         this.clickListener=clickListener;
-        this.button=button;
+        this.postFragment=postFragment;
     }
 
        @Override
@@ -107,6 +108,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> im
         }
         if(postItem.isSelected()) {
             holder.selectedOverlay.setBackgroundColor(context.getResources().getColor(R.color.colorPrimaryDark));
+
         }
         else
             holder.selectedOverlay.setBackground(context.getDrawable(R.drawable.round_background));
@@ -134,7 +136,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> im
         Posts posts = postsList.get(position);
         id=posts.getId();
         posts.setSelected(true);
-//        postsList.remove(position);
         ((PostActivity)context).sendDataToPostFragment(posts.getId());
         notifyItemRemoved(position);
     }
@@ -196,16 +197,19 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> im
 
         @Override
         public void onClick(View v) {
+
             if (getAdapterPosition() != -1) {
                 postItem = postsList.get(getAdapterPosition());
             }
             if (listener != null) {
+                Log.d(TAG,"select"+postItem.isSelected());
                 if(postItem.isSelected()){
                     postItem.setSelected(false);
                 }else{
                     postItem.setSelected(true);
                 }
 
+                Log.d(TAG,"after"+postItem.isSelected());
                 notifyItemChanged(getAdapterPosition());
                 listener.onItemClicked(getAdapterPosition());
 //                Log.d("After click",postItem.getName());
@@ -219,7 +223,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> im
             }
 
             if (listener != null) {
-                button.setVisibility(View.VISIBLE);
+                postFragment.button.setVisibility(View.VISIBLE);
 //                longClick=1;
                 //     Log.d("After Long Click",postItem.getName());
                 if(postItem.isSelected()){

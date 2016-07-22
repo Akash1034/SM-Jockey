@@ -1,44 +1,55 @@
 <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/swipe_refresh_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-       <!-- <RelativeLayout
+<!--<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">-->
+
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/layout_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+
+
+        <!-- Main layout for fragment placing -->
+        <FrameLayout
+            android:id="@+id/container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">-->
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/recyclerView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    >
+            android:layout_height="match_parent"
 
-                </android.support.v7.widget.RecyclerView>
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" >
 
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
 
-                <android.support.design.widget.FloatingActionButton
-                    android:id="@+id/send"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:visibility="invisible"
-                    android:src="@android:drawable/ic_menu_send"
-                    android:layout_alignParentBottom="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true" />
-        <!--</RelativeLayout>-->
+            </android.support.v7.widget.RecyclerView>
 
-
-
-
-        <!-- <Button
-
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:gravity="bottom"
-             android:text="Send"
-             android:visibility="invisible"
-             android:layout_centerHorizontal="true" />-->
+        </FrameLayout>
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/send_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_menu_send"
+            android:layout_gravity="bottom|right"
+            android:layout_marginBottom="16dp"
+            android:layout_marginRight="16dp"
+            android:visibility="gone"
+            app:borderWidth = "0dp" />
 
 
+    </android.support.design.widget.CoordinatorLayout>
 
+<!--</android.support.v4.widget.DrawerLayout>-->
 
 </android.support.v4.widget.SwipeRefreshLayout>
