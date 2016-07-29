@@ -20,6 +20,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.app.smjockey.Adapters.LiveWallAdapter;
+import com.app.smjockey.Adapters.LiveWallAdapter.OnItemClickListener;
 import com.app.smjockey.Models.LiveWallPosts;
 import com.app.smjockey.Models.Streams;
 import com.app.smjockey.R;
@@ -44,7 +45,7 @@ import java.util.List;
 /**
  * Created by Akash Srivastava on 04-07-2016.
  */
-public class LiveWallFragment extends android.support.v4.app.Fragment implements LiveWallAdapter.OnItemClickListener {
+public class LiveWallFragment extends android.support.v4.app.Fragment implements OnItemClickListener {
 
 
     static Bundle bundles;
@@ -122,7 +123,7 @@ public class LiveWallFragment extends android.support.v4.app.Fragment implements
 
 
         recyclerView.addOnItemTouchListener(
-                new LiveWallAdapter(getActivity(), new LiveWallAdapter.OnItemClickListener() {
+                new LiveWallAdapter(getActivity(), new OnItemClickListener() {
                     @Override public void onItemClick(View view, final int position) {
                         // TODO Handle item
 
@@ -310,6 +311,7 @@ public class LiveWallFragment extends android.support.v4.app.Fragment implements
                         e.printStackTrace();
                     }
                     Log.d(TAG,"YEah:"+liveWallPosts.getAccount().getName());
+                    liveWallPosts.setSelected(false);
                     liveWallPostsList.add(0,liveWallPosts);
                 }
                 adapter.notifyDataSetChanged();
@@ -386,5 +388,7 @@ public class LiveWallFragment extends android.support.v4.app.Fragment implements
     public void onItemClick(View view, int position) {
         Log.d(TAG, String.valueOf(position));
     }
+
+
 }
 

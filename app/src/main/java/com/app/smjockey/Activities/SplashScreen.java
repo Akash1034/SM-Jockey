@@ -2,21 +2,19 @@ package com.app.smjockey.Activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
 import com.app.smjockey.R;
 import com.app.smjockey.Receiver.NetworkChangeReceiver;
 import com.app.smjockey.Utils.Constants;
-import com.app.smjockey.Volley.NetworkCalls;
-import com.app.smjockey.Volley.Responses;
-
-import org.json.JSONObject;
 
 public class SplashScreen extends AppCompatActivity {
 
@@ -33,6 +31,18 @@ public class SplashScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
+
+        BitmapFactory.Options opts = new BitmapFactory.Options();
+        opts.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        Bitmap bmp = BitmapFactory.decodeResource(getResources(),
+                R.drawable.socialbanner, opts);
+        ImageView view = (ImageView) findViewById(R.id.imageView);
+        if (view != null) {
+            view.setImageBitmap(bmp);
+            view.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+            view.setScaleType(ImageView.ScaleType.FIT_XY);
+        }
+
 
         Intent networkIntent=new Intent();
         networkIntent.setAction("NetworkChangeReceiver");

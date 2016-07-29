@@ -3,14 +3,10 @@
     android:shape="rectangle" >
 
     <!-- view background color -->
-    <solid android:color="@color/post_item_bg" >
+    <solid android:color="@color/white" >
     </solid>
 
-    <!-- view border color and width -->
-    <stroke
-        android:width="@dimen/post_item_border_width"
-        android:color="@color/post_item_border" >
-    </stroke>
+
 
     <!-- Here is the corner radius -->
     <corners android:radius="@dimen/post_item_corner_radius" >

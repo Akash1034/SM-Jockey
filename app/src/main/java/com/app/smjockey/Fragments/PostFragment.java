@@ -111,12 +111,14 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
         streamID = bundles.getString("Stream ID");
         streamItem= (Streams) bundles.getSerializable("Stream");
         Log.d(TAG, streamItem.getId());
+        getPosts();
 
 
 
 
 
-        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
+        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.card_recycler_view);
+        adapter=new PostAdapter(getActivity(), Collections.<Posts>emptyList(),clickListener,PostFragment.this);
         if (recyclerView != null) {
             recyclerView.setHasFixedSize(true);
         }
@@ -127,7 +129,7 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
 
         postsList = new ArrayList<>();
 
-        adapter=new PostAdapter(getActivity(), Collections.<Posts>emptyList(),clickListener,PostFragment.this);
+
         if (recyclerView != null) {
             recyclerView.setAdapter(adapter);
         }
@@ -135,14 +137,14 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(recyclerView);
-        swipeRefreshLayout.setOnRefreshListener(this);
+       /* swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.post(new Runnable() {
             @Override
             public void run() {
                 getPosts();
             }
         });
-
+*/
         if (recyclerView != null) {
             recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 int pastVisiblesItems;
@@ -258,7 +260,7 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                swipeRefreshLayout.setRefreshing(false);
+//                swipeRefreshLayout.setRefreshing(false);
                 offset--;
                 Log.d(TAG,"post request error:"+error.toString());
 
@@ -308,7 +310,7 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
                 postItem.setText(text);
                 postItem.setSelected(false);
                 postsList.add(postItem);
-                swipeRefreshLayout.setRefreshing(false);
+//                swipeRefreshLayout.setRefreshing(false);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -340,6 +342,8 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
                     }
                 }
 */
+                PostAdapter.count=0;
+                PostAdapter.check=0;
                 for(int i=0;i<postsList.size();i++)
                 {
                     if(postsList.get(i).isSelected())
@@ -364,12 +368,16 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
         super.setUserVisibleHint(isVisibleToUser);
 
         // Make sure that we are currently visible
+
         if (this.isVisible()) {
             // If we are becoming invisible, then...
 
+
             if (!isVisibleToUser) {
                 // TODO stop audio playback
-            }
+       /*         Log.d(TAG,"visible");
+                getPosts();
+       */     }
         }
     }
 
@@ -404,6 +412,7 @@ public class PostFragment extends android.support.v4.app.Fragment implements OnS
     public boolean onItemLongClicked(int position) {
         // Log.d("Toggle Long Click",postsList.get(position).getName());
 //        toggleSelection(position);
+
         return true;
     }
 

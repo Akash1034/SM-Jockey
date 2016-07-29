@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -112,6 +113,7 @@ public class LiveWallAdapter extends RecyclerView.Adapter<LiveWallAdapter.ViewHo
 
 
 
+
     public LiveWallAdapter(Context context, OnItemClickListener listener) {
         mListener = listener;
         mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
@@ -142,7 +144,7 @@ public class LiveWallAdapter extends RecyclerView.Adapter<LiveWallAdapter.ViewHo
 
 
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder implements AdapterView.OnItemLongClickListener{
         TextView name;
         TextView username;
         TextView post_text;
@@ -167,6 +169,11 @@ public class LiveWallAdapter extends RecyclerView.Adapter<LiveWallAdapter.ViewHo
                     .findViewById(R.id.postImage);
 
 
+        }
+
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            return false;
         }
     }
 

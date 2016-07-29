@@ -24,6 +24,7 @@ public class LiveWallPosts implements Serializable{
     public String source;
     public String text;
     public String type;
+    public boolean isSelected;
 
     @JsonCreator
     public LiveWallPosts() {
@@ -135,6 +136,14 @@ public class LiveWallPosts implements Serializable{
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 
     public class Account

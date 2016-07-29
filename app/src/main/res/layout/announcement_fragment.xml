@@ -12,23 +12,42 @@
         android:layout_height="wrap_content"
         android:inputType="textMultiLine"
         android:ems="10"
-        android:hint="Message"
+        android:hint="@string/message"
         android:layout_margin="20dp"
         android:id="@+id/message_editText" />
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="URL"
-        android:inputType="textUri"
-        android:ems="10"
-        android:layout_margin="20dp"
-        android:id="@+id/URL_editText" />
+
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/url"
+            android:inputType="textUri"
+            android:ems="10"
+            android:layout_margin="20dp"
+            android:id="@+id/URL_editText" />
+
+        <ImageButton
+            android:id="@+id/upload_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/upload_button"
+            android:layout_centerVertical="true"
+            android:layout_margin="5dp"
+            android:text="@string/button"
+            android:contentDescription="@string/upload_button" />
+
+    </RelativeLayout>
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Duration in Seconds"
+        android:hint="@string/duration_in_seconds"
         android:inputType="numberDecimal"
         android:ems="10"
         android:layout_margin="20dp"
@@ -39,6 +58,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/push_button"
         android:layout_margin="30dp"
-        android:text="Push Notice"
+        android:text="@string/push_notice"
+        android:background="@drawable/button_background"
         android:layout_gravity="center_horizontal"/>
 </LinearLayout>

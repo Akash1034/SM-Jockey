@@ -30,8 +30,8 @@ public class LoginActivity extends AppCompatActivity {
     private final String TAG=LoginActivity.class.getSimpleName();
 
     private String user_token=null;
-    private AutoCompleteTextView mUserNameView;
-    private EditText mPasswordView;
+    private AutoCompleteTextView userNameView;
+    private EditText passwordView;
     Button loginButton;
 
     SharedPreferences.Editor editor;
@@ -44,8 +44,8 @@ public class LoginActivity extends AppCompatActivity {
 
         pref = getApplicationContext().getSharedPreferences(Constants.TOKEN_FILE, 0);
 
-        mUserNameView = (AutoCompleteTextView) findViewById(R.id.user);
-        mPasswordView = (EditText) findViewById(R.id.password);
+        userNameView = (AutoCompleteTextView) findViewById(R.id.user);
+        passwordView = (EditText) findViewById(R.id.password);
         loginButton=(Button)findViewById(R.id.login_in_button);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,28 +57,28 @@ public class LoginActivity extends AppCompatActivity {
 
     private void attemptLogin() {
 
-        mUserNameView.setError(null);
-        mPasswordView.setError(null);
+        userNameView.setError(null);
+        passwordView.setError(null);
 
-        String email = mUserNameView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        String email = userNameView.getText().toString();
+        String password = passwordView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
 
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
-            focusView = mPasswordView;
+        if (TextUtils.isEmpty(password)) {
+            passwordView.setError(getString(R.string.error_field_required));
+            focusView = passwordView;
             cancel = true;
         }
 
         if (TextUtils.isEmpty(email)) {
-            mUserNameView.setError(getString(R.string.error_field_required));
-            focusView = mUserNameView;
+            userNameView.setError(getString(R.string.error_field_required));
+            focusView = userNameView;
             cancel = true;
         } else if (!isEmailValid(email)) {
-            mUserNameView.setError(getString(R.string.error_invalid_email));
-            focusView = mUserNameView;
+            userNameView.setError(getString(R.string.error_invalid_email));
+            focusView = userNameView;
             cancel = true;
         }
 
@@ -134,6 +134,8 @@ public class LoginActivity extends AppCompatActivity {
 
                 VolleyLog.d(TAG, "Volley Error: " + error.toString());
                 Toast.makeText(getApplicationContext(),"User Not Authenticated",Toast.LENGTH_SHORT).show();
+                userNameView.setText(null);
+                passwordView.setText(null);
 
             }
         },auth,Constants.auth_url);
@@ -141,13 +143,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
-    }
 
 }

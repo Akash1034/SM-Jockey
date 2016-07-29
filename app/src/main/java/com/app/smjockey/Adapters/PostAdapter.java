@@ -4,14 +4,15 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
+import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
@@ -39,11 +40,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> im
     private LayoutInflater inflater;
     private List<Posts> postsList;
     String id;
+            public static int check=0;
+            int buttoncheck=0;
 
     ClickListener clickListener;
     PostFragment postFragment;
 
     ImageLoader imageLoader= AppController.getInstance().getImageLoader();
+    public static int count=0;
 
     public PostAdapter(Context context, List<Posts> postsList, ClickListener clickListener, PostFragment postFragment) {
         this.context = context;
@@ -111,7 +115,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> im
 
         }
         else
-            holder.selectedOverlay.setBackground(context.getDrawable(R.drawable.round_background));
+            holder.selectedOverlay.setBackground(context.getDrawable(R.drawable.card_background));
     }
 
     @Override
@@ -201,17 +205,41 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> im
             if (getAdapterPosition() != -1) {
                 postItem = postsList.get(getAdapterPosition());
             }
-            if (listener != null) {
-                Log.d(TAG,"select"+postItem.isSelected());
-                if(postItem.isSelected()){
-                    postItem.setSelected(false);
-                }else{
-                    postItem.setSelected(true);
-                }
 
-                Log.d(TAG,"after"+postItem.isSelected());
-                notifyItemChanged(getAdapterPosition());
-                listener.onItemClicked(getAdapterPosition());
+            if (check==1) {
+                    if (postItem.isSelected()) {
+                        postItem.setSelected(false);
+                        for(Posts posts : postsList)
+                        {
+                            if(posts.isSelected())
+                            {
+                                buttoncheck=1;
+                                break;
+                            }
+                        }
+                        if(buttoncheck==0) {
+                            postFragment.button.setVisibility(View.INVISIBLE);
+                            check = 0;
+                        }
+                        count--;
+                    } else {
+                        postItem.setSelected(true);
+                        count++;
+                    }
+                    final Toast toast = Toast.makeText(context, count + " Selected", Toast.LENGTH_SHORT);
+                    toast.show();
+
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            toast.cancel();
+                        }
+                    }, 500);
+
+                    notifyItemChanged(getAdapterPosition());
+                    listener.onItemClicked(getAdapterPosition());
+
 //                Log.d("After click",postItem.getName());
             }
         }
@@ -224,14 +252,26 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> im
 
             if (listener != null) {
                 postFragment.button.setVisibility(View.VISIBLE);
+                check=1;
 //                longClick=1;
                 //     Log.d("After Long Click",postItem.getName());
                 if(postItem.isSelected()){
                     postItem.setSelected(false);
+                    count--;
                 }else{
                     postItem.setSelected(true);
+                    count++;
                 }
+                final Toast toast = Toast.makeText(context,count+" Selected", Toast.LENGTH_SHORT);
+                toast.show();
 
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        toast.cancel();
+                    }
+                }, 500);
                 notifyItemChanged(getAdapterPosition());
                 return listener.onItemLongClicked(getAdapterPosition());
             }

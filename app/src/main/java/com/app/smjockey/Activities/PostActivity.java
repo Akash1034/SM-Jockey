@@ -50,7 +50,7 @@ public class PostActivity extends AppCompatActivity {
         liveWallFragment=new LiveWallFragment();
         adapter.addFragment(postFragment, "Posts");
         adapter.addFragment(liveWallFragment, "LiveWall");
-        adapter.addFragment(announcementFragment,"Announcement");
+        adapter.addFragment(announcementFragment,"Notice");
         viewPager.setAdapter(adapter);
     }
 

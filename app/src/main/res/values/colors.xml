@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimary">#4D52A3</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="cardColor">#4D52A3</color>
+    <color name="colorAccent">#ADADAD</color>
+    <color name="cardColor">#FD5DA5</color>
 
     <color name="white">#ffffff</color>
+    <color name="hintcolor">#ADADAD</color>
     <color name="post_bg">#d3d6db</color>
     <color name="post_item_bg">#ffffff</color>
     <color name="post_item_border">#c2c3c8</color>
     <color name="link">#0a80d1</color>
     <color name="username">#a0a3a7</color>
+    <color name="loginBackground">#4D52A3</color>
+    <color name="loginButton">#FD5DA5</color>
+    <color name="stream_background">#565BA1</color>
+    <color name="stream_card_text_color">#C9D4EA</color>
 </resources>

@@ -5,11 +5,18 @@
     <string name="prompt_password">Password</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
     <string name="action_logout">Logout</string>
+    <string name="eventifier_logo">Eventifier Logo</string>
+    <string name="message">Message</string>
+    <string name="url">URL</string>
+    <string name="button">Button</string>
+    <string name="duration_in_seconds">Duration in Seconds</string>
+    <string name="push_notice">Push Notice</string>
+    <string name="upload_button">Upload Button</string>
+    <string name="remove_pin">Remove Pin</string>
 </resources>
