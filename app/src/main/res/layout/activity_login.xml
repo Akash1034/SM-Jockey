@@ -43,7 +43,6 @@
                 android:textColorHint="@color/hintcolor"
                 android:textColorLink="@color/hintcolor"
                 android:singleLine="true" />
-
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -82,6 +81,15 @@
 
     </LinearLayout>
 
-
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone"
+        android:indeterminateDrawable="@drawable/progressbar" >
+    </ProgressBar>
 
 </RelativeLayout>

@@ -2,8 +2,8 @@ package com.app.smjockey.Activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.volley.VolleyError;
@@ -27,15 +28,18 @@ import java.io.UnsupportedEncodingException;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private final String TAG=LoginActivity.class.getSimpleName();
+    private final String TAG = LoginActivity.class.getSimpleName();
 
-    private String user_token=null;
+    private String user_token = null;
     private AutoCompleteTextView userNameView;
     private EditText passwordView;
     Button loginButton;
 
     SharedPreferences.Editor editor;
     SharedPreferences pref;
+    ProgressBar progressBar;
+    boolean cancel;
+    View focusView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,13 +47,14 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         pref = getApplicationContext().getSharedPreferences(Constants.TOKEN_FILE, 0);
-
         userNameView = (AutoCompleteTextView) findViewById(R.id.user);
         passwordView = (EditText) findViewById(R.id.password);
-        loginButton=(Button)findViewById(R.id.login_in_button);
+        loginButton = (Button) findViewById(R.id.login_in_button);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressBar.setVisibility(View.VISIBLE);
                 attemptLogin();
             }
         });
@@ -63,8 +68,8 @@ public class LoginActivity extends AppCompatActivity {
         String email = userNameView.getText().toString();
         String password = passwordView.getText().toString();
 
-        boolean cancel = false;
-        View focusView = null;
+        cancel = false;
+        focusView = null;
 
         if (TextUtils.isEmpty(password)) {
             passwordView.setError(getString(R.string.error_field_required));
@@ -87,8 +92,8 @@ public class LoginActivity extends AppCompatActivity {
             // form field with an error.
             focusView.requestFocus();
         } else {
-            String encoded= email+":"+password;
-            String base64=null;
+            String encoded = email + ":" + password;
+            String base64 = null;
 
             try {
                 base64 = Base64.encodeToString(encoded.getBytes("UTF-8"), Base64.DEFAULT);
@@ -98,7 +103,7 @@ public class LoginActivity extends AppCompatActivity {
             }
 
 
-            authenticate("Basic "+base64);
+            authenticate("Basic " + base64);
         }
     }
 
@@ -107,6 +112,8 @@ public class LoginActivity extends AppCompatActivity {
         NetworkCalls.authUser(new Responses() {
             @Override
             public void onSuccessResponse(JSONObject response) {
+
+                progressBar.setVisibility(View.INVISIBLE);
 
                 Log.d(TAG, "Authenication response :" + response.toString());
                 try {
@@ -133,12 +140,17 @@ public class LoginActivity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
 
                 VolleyLog.d(TAG, "Volley Error: " + error.toString());
-                Toast.makeText(getApplicationContext(),"User Not Authenticated",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "User Not Authenticated", Toast.LENGTH_SHORT).show();
                 userNameView.setText(null);
                 passwordView.setText(null);
+                focusView = userNameView;
+                focusView.requestFocus();
+
+                progressBar.setVisibility(View.INVISIBLE);
+
 
             }
-        },auth,Constants.auth_url);
+        }, auth, Constants.auth_url);
 
     }
 

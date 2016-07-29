@@ -23,7 +23,7 @@ public class SplashScreen extends AppCompatActivity {
 
     boolean loggedIn;
 
-    String user_token=null;
+    String user_token = null;
     String username;
 
 
@@ -44,36 +44,33 @@ public class SplashScreen extends AppCompatActivity {
         }
 
 
-        Intent networkIntent=new Intent();
+        Intent networkIntent = new Intent();
         networkIntent.setAction("NetworkChangeReceiver");
         sendBroadcast(networkIntent);
 
 
         SharedPreferences pref = getApplicationContext().getSharedPreferences(Constants.TOKEN_FILE, 0);
-        loggedIn=pref.getBoolean("loggedIn",false);
-        user_token=pref.getString("user_token",null);
+        loggedIn = pref.getBoolean("loggedIn", false);
+        user_token = pref.getString("user_token", null);
 
 
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
 
-                if (NetworkChangeReceiver.getConnectivityStatus(getApplicationContext())&&loggedIn)
-                {
-                    Log.d(TAG,"Net and logged in");
+                if (NetworkChangeReceiver.getConnectivityStatus(getApplicationContext()) && loggedIn) {
+                    Log.d(TAG, "Net and logged in");
                     Intent streamIntent = new Intent(SplashScreen.this, StreamActivity.class);
-                    streamIntent.putExtra("username",username);
+                    streamIntent.putExtra("username", username);
                     startActivity(streamIntent);
                     finish();
-                }
-                else if(NetworkChangeReceiver.getConnectivityStatus(getApplicationContext())&&!loggedIn){
-                    Log.d(TAG,"Net and logged out");
+                } else if (NetworkChangeReceiver.getConnectivityStatus(getApplicationContext()) && !loggedIn) {
+                    Log.d(TAG, "Net and logged out");
                     Intent loginIntent = new Intent(SplashScreen.this, LoginActivity.class);
                     startActivity(loginIntent);
                     finish();
-                }
-                else if(!NetworkChangeReceiver.getConnectivityStatus(getApplicationContext()))
-                    Toast.makeText(getApplicationContext(),"No Internet Connection",Toast.LENGTH_SHORT).show();
+                } else if (!NetworkChangeReceiver.getConnectivityStatus(getApplicationContext()))
+                    Toast.makeText(getApplicationContext(), "No Internet Connection", Toast.LENGTH_SHORT).show();
             }
         }, Constants.SPLASH_TIME_OUT);
 
