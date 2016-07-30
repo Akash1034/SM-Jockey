@@ -108,7 +108,7 @@ public class LiveWallAdapter extends RecyclerView.Adapter<LiveWallAdapter.ViewHo
 
 
     public interface OnItemClickListener {
-        public void onItemClick(View view, int position);
+        void onItemClick(View view, int position);
     }
 
 

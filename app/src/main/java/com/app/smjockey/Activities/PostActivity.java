@@ -10,18 +10,13 @@ import com.app.smjockey.Adapters.ViewPagerAdapter;
 import com.app.smjockey.Fragments.AnnouncementFragment;
 import com.app.smjockey.Fragments.LiveWallFragment;
 import com.app.smjockey.Fragments.PostFragment;
-import com.app.smjockey.Models.Streams;
 import com.app.smjockey.R;
 
 public class PostActivity extends AppCompatActivity {
 
-    private String TAG=com.app.smjockey.Activities.PostActivity.class.getSimpleName();
+    private String TAG = com.app.smjockey.Activities.PostActivity.class.getSimpleName();
 
-    private TabLayout tabLayout;
-    private ViewPager viewPager;
     private PostFragment postFragment;
-    private AnnouncementFragment announcementFragment;
-    private LiveWallFragment liveWallFragment;
 
 
     @Override
@@ -29,34 +24,36 @@ public class PostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
 
-        Bundle bundle=getIntent().getExtras();
-        Log.d(TAG,bundle.getString("Stream ID")+" "+bundle.getString("Stream Name"));
-        Streams streams= (Streams) bundle.getSerializable("Stream");
+        Bundle bundle = getIntent().getExtras();
+        Log.d(TAG, bundle.getString("Stream ID") + " " + bundle.getString("Stream Name"));
+
         PostFragment.setArgument(bundle);
         LiveWallFragment.setArgument(bundle);
         AnnouncementFragment.setArgument(bundle);
-        viewPager=(ViewPager)findViewById(R.id.view_pager);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
         setupViewPager(viewPager);
 
-        tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        tabLayout.setupWithViewPager(viewPager);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        if (tabLayout != null) {
+            tabLayout.setupWithViewPager(viewPager);
+        }
 
     }
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         postFragment = new PostFragment();
-        announcementFragment=new AnnouncementFragment();
-        liveWallFragment=new LiveWallFragment();
+        AnnouncementFragment announcementFragment = new AnnouncementFragment();
+        LiveWallFragment liveWallFragment = new LiveWallFragment();
         adapter.addFragment(postFragment, "Posts");
         adapter.addFragment(liveWallFragment, "LiveWall");
-        adapter.addFragment(announcementFragment,"Notice");
+        adapter.addFragment(announcementFragment, "Notice");
         viewPager.setAdapter(adapter);
     }
 
 
-    public void sendDataToPostFragment(String id){
-        if(postFragment != null){
+    public void sendDataToPostFragment(String id) {
+        if (postFragment != null) {
             postFragment.sendPost(id);
         }
     }

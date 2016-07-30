@@ -33,25 +33,25 @@ import io.filepicker.models.FPFile;
 public class AnnouncementFragment extends Fragment {
 
 
-    private String TAG=com.app.smjockey.Fragments.AnnouncementFragment.class.getSimpleName();
+    static String image;
+    static Bundle bundles;
+    String text;
+    String duration;
+    String created_at;
+    Streams streamItem;
+    private String TAG = com.app.smjockey.Fragments.AnnouncementFragment.class.getSimpleName();
     private EditText textEditText;
     private EditText imageEditText;
     private EditText durationEditText;
     private Button pushButton;
     private ImageButton uploadButton;
 
-    String text;
-    static String image;
-    String duration;
-    String created_at;
-
-
-
-    static Bundle bundles;
-    Streams streamItem;
-
     public AnnouncementFragment() {
         // Required empty public constructor
+    }
+
+    public static void setArgument(Bundle bundle) {
+        bundles = bundle;
     }
 
     @Override
@@ -62,40 +62,21 @@ public class AnnouncementFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.announcement_fragment, container, false);
+        initViews(view);
         Firebase.setAndroidContext(getContext());
         Filepicker.setKey("AJ7CmscxWS6O0G73HDC2Cz");
-        View view= inflater.inflate(R.layout.announcement_fragment, container, false);
-
-         textEditText=(EditText)view.findViewById(R.id.message_editText);
-        imageEditText=(EditText)view.findViewById(R.id.URL_editText);
-        durationEditText = (EditText) view.findViewById( R.id.time_editText );
-        pushButton = (Button) view.findViewById(R.id.push_button);
-        uploadButton=(ImageButton)view.findViewById(R.id.upload_button);
-
-
 
         pushButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                text=textEditText.getText().toString();
-                image=imageEditText.getText().toString();
-                duration=durationEditText.getText().toString();
-                Long created=System.currentTimeMillis();
-                created_at=String.valueOf(created/1000);
-                streamItem= (Streams) bundles.getSerializable("Stream");
-                Log.d(TAG,created_at);
-                Map<String,String> noticeValues=new HashMap<String, String>();
-                noticeValues.put("created_at",created_at);
-                noticeValues.put("duration",duration);
-                noticeValues.put("image",image);
-                noticeValues.put("text",text);
-                if(validate())
-                {
-                    Firebase firebase = new Firebase(Constants.livewall_url + streamItem.getUuid()).child("notice");
-                    firebase.setValue(noticeValues);
-
-
-                }
+                text = textEditText.getText().toString();
+                image = imageEditText.getText().toString();
+                duration = durationEditText.getText().toString();
+                Long created = System.currentTimeMillis();
+                created_at = String.valueOf(created / 1000);
+                streamItem = (Streams) bundles.getSerializable("Stream");
+                postToFirebase();
 
             }
         });
@@ -116,61 +97,39 @@ public class AnnouncementFragment extends Fragment {
         return view;
     }
 
-    public boolean validate()
-    {
-        if(duration!=null&&TextUtils.isDigitsOnly(duration))
-        {
-            return true;
-        }
-        return false;
-    }
-
-    public static void setArgument(Bundle bundle)
-    {
-        bundles=bundle;
+    public boolean validate() {
+        return duration != null && TextUtils.isDigitsOnly(duration);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Filepicker.REQUEST_CODE_GETFILE) {
-            if(resultCode == Activity.RESULT_OK) {
+            if (resultCode == Activity.RESULT_OK) {
 
                 // Filepicker always returns array of FPFile objects
                 ArrayList<FPFile> fpFiles = data.getParcelableArrayListExtra(Filepicker.FPFILES_EXTRA);
 
                 // Option multiple was not set so only 1 object is expected
                 FPFile file = fpFiles.get(0);
-                Log.d(TAG,"image:"+file.getFilename());
+                Log.d(TAG, "image:" + file.getFilename());
 
-                final String path =file.getLocalPath();
-                Log.d(TAG,path);
-                final String url = path;
+                final String path = file.getLocalPath();
+                Log.d(TAG, path);
 
-                Filepicker.uploadLocalFile(Uri.parse(url), getActivity(), new FilepickerCallback() {
+                Filepicker.uploadLocalFile(Uri.parse(path), getActivity(), new FilepickerCallback() {
                     @Override
                     public void onFileUploadSuccess(FPFile fpFile) {
                         // Do something on success
-                        Log.d(TAG,"success"+fpFile.getUrl());
-                        image=fpFile.getUrl();
+                        Log.d(TAG, "success" + fpFile.getUrl());
+                        image = fpFile.getUrl();
                         imageEditText.setText(image);
-                        Map<String,String> noticeValues=new HashMap<String, String>();
-                        noticeValues.put("created_at",created_at);
-                        noticeValues.put("duration",duration);
-                        noticeValues.put("image",image);
-                        noticeValues.put("text",text);
-                        if(validate())
-                        {
-                            Firebase firebase = new Firebase(Constants.livewall_url + streamItem.getUuid()).child("notice");
-                            firebase.setValue(noticeValues);
-
-
-                        }
+                        postToFirebase();
                     }
 
                     @Override
                     public void onFileUploadError(Throwable error) {
                         // Do something on error
-                        Log.d(TAG,"error:"+error.toString());
+                        Log.d(TAG, "error:" + error.toString());
                     }
 
                     @Override
@@ -180,12 +139,32 @@ public class AnnouncementFragment extends Fragment {
                 });
 
                 // Do something cool with the result
-            } else {
-                // Handle errors here
             }
+        }
+    }
+
+    public void initViews(View view) {
+        textEditText = (EditText) view.findViewById(R.id.message_editText);
+        imageEditText = (EditText) view.findViewById(R.id.URL_editText);
+        durationEditText = (EditText) view.findViewById(R.id.time_editText);
+        pushButton = (Button) view.findViewById(R.id.push_button);
+        uploadButton = (ImageButton) view.findViewById(R.id.upload_button);
+    }
+
+    public void postToFirebase() {
+        Map<String, String> noticeValues = new HashMap<>();
+        noticeValues.put("created_at", created_at);
+        noticeValues.put("duration", duration);
+        noticeValues.put("image", image);
+        noticeValues.put("text", text);
+        if (validate()) {
+            Firebase firebase = new Firebase(Constants.livewall_url + streamItem.getUuid()).child("notice");
+            firebase.setValue(noticeValues);
+
 
         }
     }
+
 }
 
 

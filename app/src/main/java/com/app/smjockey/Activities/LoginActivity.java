@@ -29,17 +29,15 @@ import java.io.UnsupportedEncodingException;
 public class LoginActivity extends AppCompatActivity {
 
     private final String TAG = LoginActivity.class.getSimpleName();
-
-    private String user_token = null;
-    private AutoCompleteTextView userNameView;
-    private EditText passwordView;
     Button loginButton;
-
     SharedPreferences.Editor editor;
     SharedPreferences pref;
     ProgressBar progressBar;
     boolean cancel;
     View focusView;
+    private String user_token = null;
+    private AutoCompleteTextView userNameView;
+    private EditText passwordView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,10 +45,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         pref = getApplicationContext().getSharedPreferences(Constants.TOKEN_FILE, 0);
-        userNameView = (AutoCompleteTextView) findViewById(R.id.user);
-        passwordView = (EditText) findViewById(R.id.password);
-        loginButton = (Button) findViewById(R.id.login_in_button);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        initView();
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -88,10 +83,10 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
             focusView.requestFocus();
-        } else {
+        }
+
+        else {
             String encoded = email + ":" + password;
             String base64 = null;
 
@@ -156,6 +151,14 @@ public class LoginActivity extends AppCompatActivity {
 
     private boolean isEmailValid(String email) {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+
+    public void initView()
+    {
+        userNameView = (AutoCompleteTextView) findViewById(R.id.user);
+        passwordView = (EditText) findViewById(R.id.password);
+        loginButton = (Button) findViewById(R.id.login_in_button);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
     }
 
 
